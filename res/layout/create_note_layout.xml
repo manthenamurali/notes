@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/create_edit_note_edittext_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Title"
+        android:visibility="gone" >
+
+        <requestFocus />
+    </EditText>
+
+    <com.mkr.notes.CustomEditText
+        android:id="@+id/create_edit_note_edittext_body"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:gravity="top"
+        android:hint="Subject" >
+
+        <requestFocus />
+    </com.mkr.notes.CustomEditText>
+
+</LinearLayout>

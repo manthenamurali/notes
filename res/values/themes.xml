@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    		<!-- dont forget to update this variable -->
+    <integer name="total_Default_themes">2</integer>
+
+   			 <!-- plain theme -->
+    <color name="plain_theme_text_color">#000000</color>
+    <color name="plain_theme_line_color">#8080fe</color>
+    <color name="plain_theme_background_color">#ffffff</color>
+
+    		<!-- yellow theme -->
+    <color name="yellow_theme_text_color">#000000</color>
+    <color name="yellow_theme_line_color">#824302</color>
+    <color name="yellow_theme_background_color">#ffff99</color>
+
+</resources>

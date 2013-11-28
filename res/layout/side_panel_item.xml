@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/side_pane_item_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/tool_bar_bg"
+        android:gravity="left|center_vertical"
+        android:padding="@dimen/side_pane_item_paddingleft"
+        android:textColor="@color/side_panel_item_text_color"
+        android:textSize="22sp"
+        android:typeface="serif" />
+
+    <TextView
+        android:id="@+id/side_pane_item_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/side_pane_item_title"
+        android:gravity="left"
+        android:paddingLeft="@dimen/side_pane_item_paddingleft2"
+        android:textColor="@color/side_panel_item_text_color"
+        android:textSize="12sp"
+        android:typeface="serif"
+        android:visibility="gone" />
+
+</RelativeLayout>

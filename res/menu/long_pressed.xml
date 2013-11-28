@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/item_delete"
+        android:icon="@drawable/ic_delete_gray"
+        android:showAsAction="always"
+        android:title="Delete"/>
+    <item
+        android:id="@+id/item_save"
+        android:icon="@drawable/save"
+        android:showAsAction="always"
+        android:title="Save Notes"/>
+    
+    <item
+        android:id="@+id/item_cloud"
+        android:icon="@drawable/cloud"
+        android:showAsAction="always"
+        android:title="Save notes on Cloud"/>
+    
+    <item
+        android:id="@+id/item_share"
+        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:showAsAction="ifRoom"
+        android:title="Share"/>
+
+</menu>

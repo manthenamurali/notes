@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/lable_color"
+        android:layout_width="24dip"
+        android:layout_height="24dip"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/side_pane_item_paddingleft2" />
+
+    <TextView
+        android:id="@+id/lable_name"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/lable_color"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/side_pane_item_paddingleft2"
+        android:textColor="@color/side_panel_item_text_color"
+        android:textSize="22sp"
+        android:typeface="serif" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@id/lable_name"
+        android:layout_marginLeft="@dimen/side_pane_item_paddingleft"
+        android:layout_marginRight="@dimen/side_pane_item_paddingleft"
+        android:background="@color/side_panel_items_divider" />
+
+</RelativeLayout>

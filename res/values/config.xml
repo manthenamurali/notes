@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <!-- GOOGLE_PLAY_STORE=0;
+          AMAZON_STORE=1; -->
+    <integer name="app_store_type">0</integer>
+    
+</resources>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/list_view_bg" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/side_pane_item_height"
+                android:gravity="left|bottom"
+                android:paddingLeft="@dimen/side_pane_item_paddingleft"
+                android:text="@string/sync_to"
+                android:textColor="@color/side_panel_item_text_color"
+                android:textSize="@dimen/side_pane_headers"
+                android:typeface="serif" />
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="2dip"
+                android:background="@color/side_panel_title_below_divider" />
+
+            <include
+                android:id="@+id/side_pane_item_dropbox"
+                layout="@layout/side_panel_item" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:id="@+id/relative"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/title1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_weight="1"
+                    android:gravity="bottom"
+                    android:paddingBottom="3dip"
+                    android:paddingLeft="@dimen/side_pane_item_paddingleft"
+                    android:text="@string/lables_title"
+                    android:textColor="@color/side_panel_item_text_color"
+                    android:textSize="@dimen/side_pane_headers"
+                    android:typeface="serif" />
+
+                <ImageView
+                    android:id="@+id/edit_labels"
+                    android:layout_width="48dip"
+                    android:layout_height="48dip"
+                    android:layout_gravity="right"
+                    android:scaleType="center"
+                    android:layout_marginRight="10dip"
+                    android:background="@drawable/tool_bar_bg"
+                    android:src="@drawable/ic_edit" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/divider1"
+                android:layout_width="fill_parent"
+                android:layout_height="2dip"
+                android:layout_below="@id/relative"
+                android:background="@color/side_panel_title_below_divider" />
+
+            <LinearLayout
+                android:id="@+id/labels_parent_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/divider1"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+
+</ScrollView>

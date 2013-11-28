@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="Editor Settings" >
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/text_font_entries"
+            android:entryValues="@array/text_font_values"
+            android:key="text_font"
+            android:summary="@string/pref_font_summary"
+            android:title="@string/pref_font_title" >
+        </ListPreference>
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/text_size_entries"
+            android:entryValues="@array/text_size_values"
+            android:key="text_size"
+            android:summary="@string/pref_text_size_summary"
+            android:title="@string/pref_text_size_title" >
+        </ListPreference>
+         <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            android:key="theme"
+            android:summary="@string/pref_theme_summary"
+            android:title="@string/pref_theme_title" >
+        </ListPreference>
+    </PreferenceCategory>
+    
+    <PreferenceCategory android:title="Notes display settings" >
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/sort_notes_entries"
+            android:entryValues="@array/sort_notes_values"
+            android:key="notes_sort_type"
+            android:summary="@string/pref_sort_notes_summary"
+            android:title="@string/pref_sort_notes_title" >
+        </ListPreference>
+       <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/date_type_entries"
+            android:entryValues="@array/date_type_values"
+            android:key="notes_time_type"
+            android:summary="@string/pref_time_toDisplay_summary"
+            android:title="@string/pref_time_toDisplay_title" >
+        </ListPreference>
+    </PreferenceCategory>
+    
+    <PreferenceCategory android:title="About" >
+        <Preference
+            android:key="about_msg"
+            android:title="About" />
+        <Preference
+            android:key="rate_me"
+            android:title="Rate me" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

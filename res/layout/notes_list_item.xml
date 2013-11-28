@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dip" >
+
+    <RelativeLayout
+        android:id="@+id/list_item_relative"
+        android:layout_width="match_parent"
+        android:paddingRight="3dip"
+        android:paddingLeft="3dip"
+        android:layout_height="60dip"
+        android:background="@drawable/background" >
+
+        <RelativeLayout
+            android:id="@+id/day_date_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="2dip"
+            android:background="@color/list_item_date_bg" >
+
+            <TextView
+                android:id="@+id/day"
+                android:layout_width="50dip"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:paddingLeft="2dip"
+                android:textColor="@android:color/white" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="50dip"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/day"
+                android:gravity="center_horizontal"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/date_text_size" >
+            </TextView>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/label_color"
+            android:layout_width="8dip"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="2dip" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/lable_color"
+            android:layout_toRightOf="@id/day_date_parent"
+            android:gravity="center_vertical"
+            android:paddingBottom="3dip"
+            android:paddingLeft="5dip"
+            android:paddingRight="3dip"
+            android:textSize="20sp" >
+        </TextView>
+    </RelativeLayout>
+
+</FrameLayout>

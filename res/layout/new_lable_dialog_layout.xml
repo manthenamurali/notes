@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="5dip" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/lables_enter_title" />
+
+    <EditText
+        android:id="@+id/create_lable_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dip"
+        android:text="@string/lables_pick_color" />
+
+    <RelativeLayout
+        android:id="@+id/theme_viewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="250dip" >
+
+        <ImageView
+            android:id="@+id/theme_viewHue"
+            android:layout_width="35dip"
+            android:layout_height="250dip"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:layout_marginTop="3dip"
+            android:background="@drawable/theme_hue" />
+
+        <com.mkr.notes.labels.CreateThemeView
+            android:id="@+id/theme_viewSatBri"
+            android:layout_width="match_parent"
+            android:layout_height="250dip"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="5dip"
+            android:layout_marginLeft="5dip"
+            android:layout_marginTop="3dip"
+            android:layout_toLeftOf="@id/theme_viewHue" />
+
+        <ImageView
+            android:id="@+id/theme_select_cursor"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@drawable/theme_cursor"
+            android:scaleType="matrix" />
+
+        <ImageView
+            android:id="@+id/theme_select_target"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@drawable/theme_target"
+            android:scaleType="matrix" />
+    </RelativeLayout>
+
+    <!--
+         <com.mkr.notes.labels.ColorPicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    -->
+
+</LinearLayout>

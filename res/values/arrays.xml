@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="sort_notes_entries">
+        <item>Modified Time</item>
+        <item>Created Time</item>
+    </string-array>
+    <string-array name="sort_notes_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="date_type_entries">
+        <item>Modified Date</item>
+        <item>Created Date</item>
+    </string-array>
+    <string-array name="date_type_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="text_font_entries">
+        <item>Sans</item>
+        <item>Sans mono</item>
+        <item>Serif</item>
+    </string-array>
+    <string-array name="text_font_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="text_size_entries">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+    </string-array>
+    <string-array name="text_size_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+	 <string-array name="theme_entries">
+        <item>Plain</item>
+        <item>Yellow</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    
+</resources>

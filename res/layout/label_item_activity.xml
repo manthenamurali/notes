@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/lable_color_activity"
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/side_pane_item_paddingleft2" />
+
+        <TextView
+            android:id="@+id/lable_name_activity"
+            android:layout_width="0dip"
+            android:layout_height="50dip"
+            android:layout_centerVertical="true"
+            android:layout_weight="0.8"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/side_pane_item_paddingleft"
+            android:textColor="@color/side_panel_item_text_color"
+            android:textSize="22sp"
+            android:typeface="serif" />
+
+        <ImageView
+            android:id="@+id/lable_delete_activity"
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/side_pane_item_paddingleft"
+            android:layout_weight="0.2"
+            android:background="@drawable/tool_bar_bg"
+            android:scaleType="center"
+            android:src="@drawable/content_discard" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/parent"
+        android:layout_marginLeft="@dimen/side_pane_item_paddingleft"
+        android:layout_marginRight="@dimen/side_pane_item_paddingleft"
+        android:background="@color/side_panel_items_divider" />
+
+</RelativeLayout>

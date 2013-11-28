@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <color name="list_view_bg">#EEEEEE</color>
+    <color name="list_item_date_bg">#746b62</color>
+    
+    <color name="side_panel_item_text_color">#58585b</color>
+    
+    <color name="label_color_personal">#ec7000</color>
+    <color name="label_color_work">#0099cc</color>
+    <color name="label_color_ideas">#42d692</color>
+    
+    <color name="side_panel_title_below_divider">#bebebe</color>
+    <color name="side_panel_items_divider">#dcdcdc</color>
+    
+</resources>
