@@ -46,10 +46,11 @@
     <string name="already_logged_in">This account has been already added</string>
     <string name="dropbox_subtitle">Sync all notes to your own dropbox account</string>
     
+    <string name="labels_manager">Label Manager</string>
     <string name="lables_title">Labels</string>
     <string name="lables_create_new_title">Create New Label</string>
     <string name="lables_create">Create</string>
-    <string name="lables_already_exists">Label already exists.</string>
+    <string name="lables_already_exists">Label %s already exists.</string>
     <string name="lables_delete_title">Delete Label?</string>
     <string name="lables_delete_msg">Are you sure you want to delete this label ?</string>
     <string name="lables_enter_title">Enter a label name : </string>

@@ -24,13 +24,11 @@ import android.view.ViewTreeObserver;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mkr.notes.CreateEditNoteActivity;
 import com.mkr.notes.NotesActivity;
 import com.mkr.notes.R;
 
@@ -59,7 +57,7 @@ public class LabelsActivity extends Activity {
 		final ActionBar actionBar = getActionBar();
 		if(actionBar != null) {
 			actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
-			actionBar.setTitle(getString(R.string.lables_title));
+			actionBar.setTitle(getString(R.string.labels_manager));
 			actionBar.setDisplayHomeAsUpEnabled(true);
 		}
 		
@@ -176,7 +174,7 @@ public class LabelsActivity extends Activity {
 				final String labelName = edit.getText().toString();
 				final boolean isAlreadyExists = LabelUtils.checkIfLabelAlreadyExists(labelName);
 				if(isAlreadyExists) {
-					Toast.makeText(LabelsActivity.this, getString(R.string.lables_already_exists), Toast.LENGTH_LONG).show();
+					Toast.makeText(LabelsActivity.this, String.format(getString(R.string.lables_already_exists), labelName), Toast.LENGTH_LONG).show();
 				} else {
 					LabelUtils.addNewLabel(labelName, getColor());
 					mLabelAdapter.updateValues();
@@ -309,11 +307,20 @@ public class LabelsActivity extends Activity {
 		
 		private void getData() {
 			mLabelsMap = LabelUtils.getAllSavedLables();
-			mLabelNames = new ArrayList<String>();
 			final Iterator<String> keysIterator = mLabelsMap.keySet().iterator();
+			
+			mLabelNames = new ArrayList<String>();
+			mLabelNames.add(0, LabelsActivity.LABELS_DEFAULT_PERSONAL);
+			mLabelNames.add(1, LabelsActivity.LABELS_DEFAULT_WORK);
+			mLabelNames.add(2, LabelsActivity.LABELS_DEFAULT_IDEAS);
+			
 			while (keysIterator.hasNext()) {
-				final String key = keysIterator.next();
-				mLabelNames.add(key);
+				final String labelName = keysIterator.next();
+				if(!(LabelsActivity.LABELS_DEFAULT_PERSONAL.equals(labelName) 
+						|| LabelsActivity.LABELS_DEFAULT_WORK.equals(labelName) 
+						|| LabelsActivity.LABELS_DEFAULT_IDEAS.equals(labelName))) {
+					mLabelNames.add(labelName);
+				}
 			}
 		}
 		

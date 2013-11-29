@@ -1,17 +1,13 @@
 package com.mkr.notes.labels;
 
 import java.util.Map;
-import java.util.prefs.Preferences;
-
-import com.mkr.notes.R;
-import com.mkr.notes.SettingsActivity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.preference.PreferenceManager;
+
+import com.mkr.notes.R;
 
 public class LabelUtils {
 
@@ -30,7 +26,7 @@ public class LabelUtils {
 		return mLabelUtils;
 	}
 	
-	public void setContext(final Context context) {
+	public void init(final Context context) {
 		mContext = context;
 		createDefaultLablePreferences();
 	}

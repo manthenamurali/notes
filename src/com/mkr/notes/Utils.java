@@ -41,12 +41,9 @@ public class Utils {
 		return mUtils;
 	}
 
-	public void setContext(final Context context) {
+	public void init(final Context context) {
 		mContext = context;
-	}
-
-	public void init() {
-		mRobotoSlabFont = Typeface.createFromAsset(mContext.getAssets(), "fonts/RobotoSlab-Regular.ttf");
+		//mRobotoSlabFont = Typeface.createFromAsset(mContext.getAssets(), "fonts/RobotoSlab-Regular.ttf");
 
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		mDateTypeToDisplay = Integer.parseInt(mPrefs.getString(SettingsActivity.PREF_DATE_TO_DISPLAY, ""+SettingsActivity.DATE_TYPE_MODIFIED));
@@ -58,7 +55,6 @@ public class Utils {
 		loadNoteFont(noteFont);
 		loadNoteFontSize(noteFontSize);
 		loadTheme();
-		
 	}
 
 	public void setDefaultThemesToSharedPref() {

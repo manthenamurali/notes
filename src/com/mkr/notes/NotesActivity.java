@@ -10,13 +10,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
-import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,10 +22,11 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -55,7 +54,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mkr.cloud.CloudUtils;
-import com.mkr.cloud.Dropbox;
 import com.mkr.notes.NotesAdapter.Holder;
 import com.mkr.notes.labels.LabelUtils;
 import com.mkr.notes.labels.LabelsActivity;
@@ -101,11 +99,10 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		INTERNAL_STORAGE_PATH = getFilesDir().getPath() +"/" + NOTES_PARENT_DIR_NAME;
 		
 		final Utils utils = Utils.getInstance();
-		utils.setContext(NotesActivity.this);
-		utils.init();
+		utils.init(NotesActivity.this);
 		
 		final LabelUtils labelUtils = LabelUtils.getInstance();
-		labelUtils.setContext(NotesActivity.this);
+		labelUtils.init(NotesActivity.this);
 		
 		final CloudUtils cloudUtils = CloudUtils.getInstance();
 		cloudUtils.init(getApplicationContext());
@@ -189,7 +186,9 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	        
 		createNotesFolder();
 		PreferenceManager.getDefaultSharedPreferences(NotesActivity.this).registerOnSharedPreferenceChangeListener(this);
-		updateSidePaneLayout();
+		
+		updateSidepaneHandler.sendEmptyMessage(0);
+		//updateSidePaneLayout();
 	}
 
 	@Override
@@ -390,12 +389,24 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		final Iterator<String> keysIterator = labels.keySet().iterator();
 		final LayoutInflater inflater = (LayoutInflater) getSystemService(Service.LAYOUT_INFLATER_SERVICE);
 		
+		final ArrayList<String> labelNamesList = new ArrayList<String>();
+		labelNamesList.add(0, LabelsActivity.LABELS_DEFAULT_PERSONAL);
+		labelNamesList.add(1, LabelsActivity.LABELS_DEFAULT_WORK);
+		labelNamesList.add(2, LabelsActivity.LABELS_DEFAULT_IDEAS);
+		
 		while (keysIterator.hasNext()) {
+			final String labelName = keysIterator.next();
+			if(!(LabelsActivity.LABELS_DEFAULT_PERSONAL.equals(labelName) 
+					|| LabelsActivity.LABELS_DEFAULT_WORK.equals(labelName) 
+					|| LabelsActivity.LABELS_DEFAULT_IDEAS.equals(labelName))) {
+				labelNamesList.add(labelName);
+			}
+		}
+		
+		for (String label : labelNamesList ) {
 			final RelativeLayout lableLayout = (RelativeLayout) inflater.inflate(R.layout.label_item, null);
-			final String key = keysIterator.next(); 
-			final int color = (Integer) labels.get(key);
-			((TextView)lableLayout.findViewById(R.id.lable_name)).setText(key);
-			((TextView)lableLayout.findViewById(R.id.lable_color)).setBackgroundColor(color);
+			((TextView)lableLayout.findViewById(R.id.lable_name)).setText(label);
+			((TextView)lableLayout.findViewById(R.id.lable_color)).setBackgroundColor((Integer) labels.get(label));
 			
 			labelsParent.addView(lableLayout);
 		}
@@ -502,6 +513,12 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		}
 	}
 	
+	Handler updateSidepaneHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			updateSidePaneLayout();
+		};
+	};
+	
 	class DisplaySavedLists extends AsyncTask<Void, Void, Void> {
 
 		private ArrayList<Note> data;
@@ -518,7 +535,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			return null;
 		}
 
-		@SuppressWarnings("deprecation")
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
