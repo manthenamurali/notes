@@ -2,9 +2,11 @@ package com.mkr.cloud;
 
 import java.io.File;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.mkr.notes.NotesActivity;
 import com.mkr.notes.R;
@@ -35,7 +37,8 @@ public class CloudUtils {
 	
 	public void loginIntoDropBox(final NotesActivity activity) {
 		if(mDropbox.isAlreadyLogged()) {
-			Toast.makeText(mContext, mContext.getResources().getString(R.string.already_logged_in), Toast.LENGTH_LONG).show();
+			//Toast.makeText(mContext, mContext.getResources().getString(R.string.already_logged_in), Toast.LENGTH_LONG).show();
+			displayAlertDialog(mContext.getResources().getString(R.string.dropbox_title));
 		} else {
 			setDropboxLoginState(true);
 			mDropbox.Login();
@@ -80,6 +83,29 @@ public class CloudUtils {
 		uploadTask.execute();
 	}
 
+	public void displayAlertDialog(final String whichAccount) {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(mContext); 
+		
+		final Resources res = mContext.getResources(); 
+		builder.setTitle(res.getString(R.string.already_logged));
+		if(whichAccount.equalsIgnoreCase(res.getString(R.string.dropbox_title))) {
+			builder.setMessage(res.getString(R.string.remove_added_dropbox_account));
+		}
+		builder.setPositiveButton(res.getString(R.string.logout), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				mDropbox.logOut();
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				
+			}
+		});
+		builder.create().show();
+	}
+	
 	static class UploadFilesToStorage extends AsyncTask<Void, Void, Void> {
 		
 		private final int storageType;

@@ -6,6 +6,7 @@ import java.util.List;
 import com.mkr.notes.labels.LabelUtils;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -51,13 +52,14 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 			holder = new Holder();
 			convertView = View.inflate(mContext, R.layout.notes_list_item, null);
 			holder.mTitle = (TextView) convertView.findViewById(R.id.title);
-			holder.mDay = (TextView) convertView.findViewById(R.id.day);
+			holder.mMonth = (TextView) convertView.findViewById(R.id.month);
 			holder.mDate = (TextView) convertView.findViewById(R.id.date);
+			holder.mDay = (TextView) convertView.findViewById(R.id.day);
 			holder.mListParent = (RelativeLayout) convertView.findViewById(R.id.list_item_relative);
 			holder.mLabelColor = (TextView) convertView.findViewById(R.id.label_color);
 			
 			holder.mTitle.setTypeface(Utils.getInstance().getRobotoSlabFontTypeface());
-			holder.mDay.setTypeface(Utils.getInstance().getRobotoSlabFontTypeface());
+			holder.mMonth.setTypeface(Utils.getInstance().getRobotoSlabFontTypeface());
 			holder.mDate.setTypeface(Utils.getInstance().getRobotoSlabFontTypeface());
 			
 			convertView.setTag(holder);
@@ -79,8 +81,10 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 		} else {
 			date = Utils.getReadableTime(data.modifiedDate);
 		}
+		
+		holder.mMonth.setText(date.substring(4, 7));
+		holder.mDate.setText(date.substring(8, 10));
 		holder.mDay.setText(date.substring(0, 3));
-		holder.mDate.setText(date.substring(4, 6));
 				
 		if(mSelectedList != null && mSelectedList.contains(data.createDate)) {
 			holder.mListParent.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.background_selected));
@@ -94,9 +98,10 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 	static class Holder {
 		private RelativeLayout mListParent;
 		public TextView mTitle;
-		public TextView mDay;
+		public TextView mMonth;
 		public TextView mLabelColor;
 		public TextView mDate;
+		public TextView mDay;
 		public long mCreationDate;
 		public String mNotePath;
 		public String mNoteLabel;

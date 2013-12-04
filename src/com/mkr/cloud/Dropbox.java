@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.Entry;
@@ -19,6 +20,7 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.TokenPair;
 import com.dropbox.client2.session.Session.AccessType;
 import com.mkr.notes.NotesActivity;
+import com.mkr.notes.R;
 
 public class Dropbox {
 
@@ -124,10 +126,11 @@ public class Dropbox {
 		mDBApi.getSession().startAuthentication(mContext);
 	}
 
-	private void logOut() {
+	public void logOut() {
 		mDBApi.getSession().unlink();
 		clearKeys();
 		setLoggedIn(false);
+		Toast.makeText(mContext, mContext.getResources().getString(R.string.remove_account_succesful), Toast.LENGTH_LONG).show();
 	}
 
 	private void storeKeys(String key, String secret) {

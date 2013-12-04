@@ -1,5 +1,8 @@
 package com.mkr.notes;
 
+import com.mkr.notes.labels.LabelsActivity;
+
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -9,6 +12,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.view.MenuItem;
 import android.view.View;
 
 public class SettingsActivity extends PreferenceActivity{
@@ -16,8 +20,11 @@ public class SettingsActivity extends PreferenceActivity{
 	public static final String THEMES_SHARED_PREF       =  "themes";
 	public static final String PREF_THEME_PLAIN      	=  "theme_plain";
 	public static final String PREF_THEME_YELLOW	    =  "theme_yellow";
+	public static final String PREF_THEME_GREEN		    =  "theme_green";
+	
 	public static final int THEME_PLAIN      			=  0;
 	public static final int THEME_YELLOW	        	=  1;
+	public static final int THEME_GREEN	        		=  2;
 	
 	public static final String PREF_DATE_TO_DISPLAY 		= "notes_time_type";
 	public static final String PREF_LIST_SORT_TYPE 			= "notes_sort_type";
@@ -36,12 +43,20 @@ public class SettingsActivity extends PreferenceActivity{
 	
 	public static final int DATE_TYPE_MODIFIED  	= 0;
 	public static final int DATE_TYPE_CREATED 		= 1;
+	
+	public static final String PREF_FIRST_LAUNCH   			= "first_launch";
 
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		final ActionBar actionBar = getActionBar();
+		if(actionBar != null) {
+			actionBar.setDisplayHomeAsUpEnabled(true);
+	        actionBar.setHomeButtonEnabled(true);
+		}
+        
 		addPreferencesFromResource(R.xml.prefs);
 		findPreference("about_msg").setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override
@@ -58,18 +73,30 @@ public class SettingsActivity extends PreferenceActivity{
 				Intent intent = new Intent(Intent.ACTION_VIEW);
 				if(storeType == 0) {
 					try { 
-						intent.setData(Uri.parse("market://details?id=com.mkr.file_explorer"));
+						intent.setData(Uri.parse("market://details?id=com.mkr.notes"));
 						startActivity(intent);
 					} catch (Exception e) { //google play app is not installed
-						intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.com.mkr.file_explorer"));
+						intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.mkr.notes"));
 					}
 				} else if(storeType == 1) {
-					intent.setData(Uri.parse("http://www.amazon.com/gp/mas/dl/android?p=com.com.mkr.file_explorer"));
+					intent.setData(Uri.parse("http://www.amazon.com/gp/mas/dl/android?p=com.mkr.notes"));
 				}
 				startActivity(intent);
 				return false;
 			}
 		});
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			final Intent i = new Intent(SettingsActivity.this, NotesActivity.class);
+			i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+			startActivity(i);
+			break;
+		};
+		return true;
 	}
 	
 	/**

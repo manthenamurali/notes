@@ -6,10 +6,10 @@
     <RelativeLayout
         android:id="@+id/list_item_relative"
         android:layout_width="match_parent"
-        android:paddingRight="3dip"
-        android:paddingLeft="3dip"
         android:layout_height="60dip"
-        android:background="@drawable/background" >
+        android:background="@drawable/background"
+        android:paddingLeft="3dip"
+        android:paddingRight="3dip" >
 
         <RelativeLayout
             android:id="@+id/day_date_parent"
@@ -22,23 +22,34 @@
             android:background="@color/list_item_date_bg" >
 
             <TextView
-                android:id="@+id/day"
+                android:id="@+id/month"
                 android:layout_width="50dip"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:paddingLeft="2dip"
-                android:textColor="@android:color/white" >
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/day_month_text_size" >
             </TextView>
 
             <TextView
                 android:id="@+id/date"
                 android:layout_width="50dip"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/day"
+                android:layout_below="@id/month"
                 android:gravity="center_horizontal"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/date_text_size" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/day"
+                android:layout_width="50dip"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/date"
+                android:gravity="center_horizontal"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/day_month_text_size" >
             </TextView>
         </RelativeLayout>
 

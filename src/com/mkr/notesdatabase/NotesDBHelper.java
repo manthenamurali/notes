@@ -1,6 +1,8 @@
 package com.mkr.notesdatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,7 +25,12 @@ public class NotesDBHelper {
 				SQLiteHelper.COLUMN_NOTE_LABEL
 			};
 
+	/**
+	 * this is for temp use remove it later
+	 */
+	private static final Map<Long, Note> mNotesInfo = new HashMap<Long, Note>();
 	
+	//private constructor
 	private NotesDBHelper() { }
 
 	public static NotesDBHelper getInstance(final Context mContext) {
@@ -69,24 +76,56 @@ public class NotesDBHelper {
 				null, null, null, null, null);
 		if(cursor != null) {
 			while (cursor.moveToNext()) {
-				Note note = new Note();
+				final Note note = new Note();
 				note.createDate = Long.valueOf(cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_CREATED_TIME)));
 				note.modifiedDate = Long.valueOf(cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_MODIFIED_TIME)));
 				note.title = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_TITLE));
 				note.NotePath = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_PATH));
 				note.NoteLabel = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_LABEL));
 				notesList.add(note);
+				
+				mNotesInfo.put(note.createDate, note);
 			}
 		}
 
-		Log.e("kpt","Total notes count ---->"+notesList.size());
+		/*Log.e("mkr","Total notes count ---->"+notesList.size());
 		for (Note note : notesList) {
-			Log.e("kpt","Title ---->"+note.title);
-		}
+			Log.e("mkr","Title ---->"+note.title);
+		}*/
+		
 		return notesList;
 	}
 
+	public static Map<Long, Note> getCurrentNotesMap() {
+		return mNotesInfo;
+	}
 
+	public Map<String, Integer> getLabelsDetails() {
+		final Cursor cursor = mSQLWritableDatabase.query(SQLiteHelper.TABLE_NAME, allColumns, 
+				null, null, null, null, null);
+		final Map<String, Integer> labelsMap = new HashMap<String, Integer>();
+		if(cursor != null) {
+			while (cursor.moveToNext()) {
+				int counter = 0;
+				final String noteLabel = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_LABEL));
+				if(labelsMap.containsKey(noteLabel)) {
+					counter = labelsMap.get(noteLabel);
+				}
+				counter = counter + 1;
+				labelsMap.put(noteLabel, counter);
+			}
+		}
+		
+		/*Log.e("mkr","labels info");
+		Iterator<String> keysIterator = labelsMap.keySet().iterator();
+		while (keysIterator.hasNext()) {
+			String next = keysIterator.next();
+			Log.e("mkr","for " + next + " lables are --> " + labelsMap.get(next));
+		}*/
+		
+		return labelsMap;
+	}
+	
 	public void close() {
 		mSQLWritableDatabase.close();
 	}

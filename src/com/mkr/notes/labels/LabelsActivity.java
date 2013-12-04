@@ -68,7 +68,6 @@ public class LabelsActivity extends Activity {
 
 		mLabelAdapter = new LabelsAdapter();
 		labelsListView.setAdapter(mLabelAdapter);
-
 	};
 
 	@Override
@@ -83,6 +82,7 @@ public class LabelsActivity extends Activity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			final Intent i = new Intent(LabelsActivity.this, NotesActivity.class);
+			i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 			startActivity(i);
 			break;
 		case R.id.menu_add_new_label:
@@ -156,6 +156,7 @@ public class LabelsActivity extends Activity {
 
 		ViewTreeObserver vto = dialogView.getViewTreeObserver();
 		vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@SuppressWarnings("deprecation")
 			@Override public void onGlobalLayout() {
 				//moveCursor();
 				//moveTarget();

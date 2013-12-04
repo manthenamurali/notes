@@ -2,7 +2,7 @@
 <resources>
 
     		<!-- dont forget to update this variable -->
-    <integer name="total_Default_themes">2</integer>
+    <integer name="total_Default_themes">3</integer>
 
    			 <!-- plain theme -->
     <color name="plain_theme_text_color">#000000</color>
@@ -13,5 +13,10 @@
     <color name="yellow_theme_text_color">#000000</color>
     <color name="yellow_theme_line_color">#824302</color>
     <color name="yellow_theme_background_color">#ffff99</color>
+    
+    		<!-- green theme -->
+    <color name="green_theme_text_color">#307445</color>
+    <color name="green_theme_line_color">#337647</color>
+    <color name="green_theme_background_color">#d2e9cd</color>
 
 </resources>

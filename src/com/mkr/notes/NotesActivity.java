@@ -13,6 +13,8 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.DialogInterface;
@@ -20,8 +22,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -36,6 +40,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,11 +49,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.TextView.BufferType;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -87,7 +94,10 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 	
-	private ShareActionProvider mShareActionProvider;
+	private Note mSelectedNote;
+	
+	private AlertDialog mHeplpTutorialAlertDialog;
+	private int mHelpTutorialPage;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +115,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		labelUtils.init(NotesActivity.this);
 		
 		final CloudUtils cloudUtils = CloudUtils.getInstance();
-		cloudUtils.init(getApplicationContext());
+		cloudUtils.init(NotesActivity.this);
 		
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -133,6 +143,14 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 						mSelectedItemsList.add(holder.mCreationDate);
 					}
 
+					if(mSelectedItemsList.size() == 0) {
+						//refresh the ui list
+						DisplaySavedLists displaySavedListsTask = new DisplaySavedLists(); ;
+						displaySavedListsTask.execute();
+						mActionMode.finish();
+						return;
+					}
+					
 					mActionMode.setTitle(""+mSelectedItemsList.size());
 					mNotesAdapter.setSelectedLists(mSelectedItemsList);
 					mActionMode.invalidate();
@@ -162,6 +180,14 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 					mSelectedItemsList.add(holder.mCreationDate);
 				}
 
+				if(mSelectedItemsList.size() == 0) {
+					//refresh the ui list
+					DisplaySavedLists displaySavedListsTask = new DisplaySavedLists(); ;
+					displaySavedListsTask.execute();
+					mActionMode.finish();
+					return true;
+				}
+				
 				mNotesAdapter.setSelectedLists(mSelectedItemsList);
 				if(mActionMode == null) {
 					mActionMode = NotesActivity.this.startActionMode(ActionModeCallback);
@@ -179,16 +205,25 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				invalidateOptionsMenu(); 
 			}
 			public void onDrawerOpened(View drawerView) {
+				updateSidepaneHandler.sendEmptyMessage(0);
 				invalidateOptionsMenu(); 
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 	        
 		createNotesFolder();
-		PreferenceManager.getDefaultSharedPreferences(NotesActivity.this).registerOnSharedPreferenceChangeListener(this);
+		
+		final SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(NotesActivity.this); 
+		sPref.registerOnSharedPreferenceChangeListener(this);
 		
 		updateSidepaneHandler.sendEmptyMessage(0);
 		//updateSidePaneLayout();
+		
+		final boolean shouldDispChangeLog = sPref.getBoolean(SettingsActivity.PREF_FIRST_LAUNCH, true);
+		if(shouldDispChangeLog) {
+			sPref.edit().putBoolean(SettingsActivity.PREF_FIRST_LAUNCH, false).commit();
+			displayWatsNewDialog();
+		}
 	}
 
 	@Override
@@ -244,6 +279,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		return true;
 	} 
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -266,7 +302,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			startActivity(intent);
 			break;
 		case R.id.menu_help:
-			displayHelpDialog();
+			showDialog(0);
 			break;
 		case R.id.menu_feedback:
 			final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -283,6 +319,12 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	private ActionMode.Callback ActionModeCallback = new ActionMode.Callback() {
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			 MenuItem item = menu.findItem(R.id.item_share);
+			 if(mSelectedItemsList.size() > 1) {
+				 item.setVisible(false);
+			 } else {
+				 item.setVisible(true);
+			 }
 			return true;
 		}
 
@@ -297,8 +339,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflator = getMenuInflater();
 			inflator.inflate(R.menu.long_pressed, menu);
-		    MenuItem item = menu.findItem(R.id.item_share);
-		    mShareActionProvider = (ShareActionProvider) item.getActionProvider();
 			return true;
 		}
 
@@ -316,16 +356,25 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				shareNotes();
 				break;
 			case R.id.item_cloud:
-				Log.e("mkr","before-->"+mSelectedItemsList.size());
 				final int selectedFilesLength = mSelectedItemsList.size();
 				final File[] files = new File[selectedFilesLength];
 				for (int i = 0; i < selectedFilesLength; i++) {
 					final String path = INTERNAL_STORAGE_PATH + "/" + mSelectedItemsList.get(i) + ".txt";
-					Log.e("mkr","file path-->"+path);
 					files[i] = new File(path);
 				}
 				
 				displaySelectCloudDialog(files);
+				break;
+			case R.id.item_info:
+				
+				final int len = mSelectedItemsList.size();
+				final File[] fileArr = new File[len];
+				for (int i = 0; i < len; i++) {
+					final String path = INTERNAL_STORAGE_PATH + "/" + mSelectedItemsList.get(i) + ".txt";
+					fileArr[i] = new File(path);
+				}
+				
+				displayNotesInfo(fileArr);
 				break;
 			default:
 				break;
@@ -340,11 +389,47 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		}
 	};
 
+	private void displayNotesInfo(final File[] files) {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(NotesActivity.this);
+		builder.setTitle(getString(R.string.info));	
+		builder.setMessage(getMessageStringForInfoDialog(files));
+		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				
+			}
+		});
+		builder.create().show();
+	}
+	
+	private String getMessageStringForInfoDialog(final File[] files) {
+		final StringBuffer sb = new StringBuffer(); 
+		final Map<Long, Note> notesInfo = NotesDBHelper.getCurrentNotesMap();
+		if(files.length == 1) {
+			final File file = files[0];
+			sb.append(" Name : " + notesInfo.get(mSelectedItemsList.get(0)).title + ".txt" + "\n");
+			sb.append(" Path : "+ file.getParent() + "\n");
+			sb.append(" Size : "+ Utils.readableFileSize(file.length()) + " ("+file.length() +" bytes)" + "\n\n");
+			sb.append(" Modified : " + Utils.getReadableTime(file.lastModified())+"\n");
+		} else {
+			sb.append(" Contains : " + files.length + " Items\n");
+			sb.append(" Path : "+ files[0].getParent() + "\n");
+			
+			long totalSize = 0; 
+			for(final File f : files) {
+				totalSize += f.length();
+			}
+			sb.append(" Total Size : " +  Utils.readableFileSize(totalSize));
+		}
+		
+		return sb.toString();
+	}
+	
 	private void displaySelectCloudDialog(final File[] filesToUpload) {
 		
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.select_cloud_options));
-		String[] options = CloudUtils.getInstance().getAllInstalledCloudOptions();
+		final String[] options = CloudUtils.getInstance().getAllInstalledCloudOptions();
 		if(options == null) {
 			builder.setMessage(getString(R.string.login_into));
 		} else {
@@ -358,12 +443,16 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				switch (which) {
-				case -1:
-					CloudUtils.uploadFiles(filesToUpload, R.string.dropbox_title);
-					break;
-				default:
-					break;
+				if(options == null) {
+					mDrawerLayout.openDrawer(Gravity.LEFT);
+				} else {
+					switch (which) {
+					case -1:
+						CloudUtils.uploadFiles(filesToUpload, R.string.dropbox_title);
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		});
@@ -385,6 +474,8 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		((TextView) dropBoxView.findViewById(R.id.side_pane_item_summary)).setText(getString(R.string.dropbox_subtitle));
 		
 		final LinearLayout labelsParent = (LinearLayout) findViewById(R.id.labels_parent_linear_layout);
+		labelsParent.removeAllViews();
+		
 		final Map<String, ?> labels = LabelUtils.getAllSavedLables();
 		final Iterator<String> keysIterator = labels.keySet().iterator();
 		final LayoutInflater inflater = (LayoutInflater) getSystemService(Service.LAYOUT_INFLATER_SERVICE);
@@ -403,10 +494,18 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			}
 		}
 		
+		final Map<String, Integer> lableDetails = mDBHelper.getLabelsDetails();
+		
 		for (String label : labelNamesList ) {
 			final RelativeLayout lableLayout = (RelativeLayout) inflater.inflate(R.layout.label_item, null);
 			((TextView)lableLayout.findViewById(R.id.lable_name)).setText(label);
 			((TextView)lableLayout.findViewById(R.id.lable_color)).setBackgroundColor((Integer) labels.get(label));
+			
+			int count = 0;
+			if(lableDetails.containsKey(label)) {
+				count = lableDetails.get(label);
+			}
+			((TextView)lableLayout.findViewById(R.id.lable_count)).setText("(" + count + ")");
 			
 			labelsParent.addView(lableLayout);
 		}
@@ -462,7 +561,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			pd = ProgressDialog.show(NotesActivity.this, getString(R.string.backup_title), null);
+			pd = ProgressDialog.show(NotesActivity.this, null, getString(R.string.backup_title));
 		}
 
 		@Override
@@ -535,6 +634,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			return null;
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
@@ -560,17 +660,125 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	}
 
 	private void shareNotes() {
-		Intent sendIntent = new Intent();
-		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
-		sendIntent.setType("text/plain");
-		startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
-		if (mShareActionProvider != null) {
-	        mShareActionProvider.setShareIntent(sendIntent);
-	    }
+		if(mSelectedItemsList == null || mSelectedItemsList.size() == 0) {
+			return;
+		}
+		
+		final String path = INTERNAL_STORAGE_PATH + "/" + mSelectedItemsList.get(0) + ".txt";
+		final File file = new File(path);
+		
+		Intent i = new Intent();
+		i.setAction(Intent.ACTION_SEND);
+		i.setType("text/plain");
+		i.putExtra(Intent.EXTRA_SUBJECT, file.getName());
+		i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+		i = Intent.createChooser(i, "Send to ..");
+
+		try {
+			startActivity(i);
+		} catch (Exception e) {
+			
+		}
 	}
 	
-	private void displayHelpDialog() {
+	/**
+	 * displays the change logs for the version
+	 */
+	private void displayWatsNewDialog() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(NotesActivity.this);
+		builder.setTitle(R.string.welcome_msg);
+
+		final ScrollView scrollView = new ScrollView(this);
+
+		final TextView propertiesMsg = new TextView(this); 
+		propertiesMsg.setPadding(10, 0, 0, 0);
+		propertiesMsg.setTextSize(15);
+		propertiesMsg.setText(R.string.change_log);
+
+		scrollView.addView(propertiesMsg);
+		builder.setView(scrollView);
+
+		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			@SuppressWarnings("deprecation")
+			public void onClick(DialogInterface dialog, int which) {
+				 PreferenceManager.getDefaultSharedPreferences(NotesActivity.this).edit().putBoolean(SettingsActivity.PREF_FIRST_LAUNCH, false).commit();
+				 showDialog(0);
+			}
+		});
+
+		builder.create().show();
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		mHelpTutorialPage = 1;
+
+		final AlertDialog.Builder builder = new AlertDialog.Builder(NotesActivity.this);
+		final Resources res = getResources();
+
+		String title = "help_page_title_"+mHelpTutorialPage;
+		String message = "help_page_description_"+mHelpTutorialPage;
+
+		String resourceTitle = getString(res.getIdentifier(title, "string", getPackageName()));
+		String resourceBody = getString(res.getIdentifier(message, "string", getPackageName()));
+
+		builder.setTitle(resourceTitle);
+		builder.setMessage(resourceBody);
+
+		final int maxPages = res.getInteger(R.integer.max_help_tut_pages);
+
+		builder.setPositiveButton(getString(R.string.next), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+
+			}
+		});
+
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				mHelpTutorialPage = 1;
+			}
+		});
+
+		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				mHelpTutorialPage = 1;
+			}
+		});
+		
+		mHeplpTutorialAlertDialog = builder.create();
+		mHeplpTutorialAlertDialog.show();
+
+		View button = mHeplpTutorialAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+		button.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				mHelpTutorialPage ++;
+
+				String title = "help_page_title_"+mHelpTutorialPage;
+				String message = "help_page_description_"+mHelpTutorialPage;
+
+				String resourceTitle = getString(res.getIdentifier(title, "string", getPackageName()));
+				String resourceBody = getString(res.getIdentifier(message, "string", getPackageName()));
+
+				mHeplpTutorialAlertDialog.setTitle(resourceTitle);
+				mHeplpTutorialAlertDialog.setMessage(resourceBody);
+
+				if(mHelpTutorialPage == maxPages - 1) {
+					mHeplpTutorialAlertDialog.getButton(Dialog.BUTTON_POSITIVE).setClickable(false);
+					mHeplpTutorialAlertDialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
+				} else {
+					mHeplpTutorialAlertDialog.getButton(Dialog.BUTTON_POSITIVE).setClickable(true);
+					mHeplpTutorialAlertDialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
+				}
+			}});
+		return mHeplpTutorialAlertDialog;
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		super.onPrepareDialog(id, dialog);
+		
 		
 	}
 	
@@ -590,6 +798,11 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		} else if(SettingsActivity.PREF_TEXT_SIZE.equals(key)) {
 			final int noteFontSize = Integer.parseInt(sharedPreferences.getString(SettingsActivity.PREF_TEXT_SIZE, ""+SettingsActivity.TEXT_SIZE_MEDIUM));
 			utils.loadNoteFontSize(noteFontSize);
+		} else if(key.equals(SettingsActivity.PREF_FIRST_LAUNCH)) {
+			final boolean val = sharedPreferences.getBoolean(SettingsActivity.PREF_FIRST_LAUNCH, false);
+			if(val) {
+				displayWatsNewDialog();
+			}
 		}
 	}
 }

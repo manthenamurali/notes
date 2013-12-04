@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Notes</string>
+    <string name="app_name">Easy Notes</string>
+     <string name="app_label_settings">Easy Notes Settings</string>
+     
     <string name="add_new">Create New Note</string>
     <string name="discard">Discard</string>
     <string name="search">Search</string>
@@ -13,10 +15,11 @@
     <string name="confirm_delete_title">Confirm Delete</string>
     <string name="confirm_delete_msg">Are you sure you want to delete the notes?</string>
     
-    <string name="version">Version : 0.6 </string>
+    <string name="version">Version : 0.1 </string>
  	<string name="author">Developer : Manthena Murali \n manthena.android@gmail.com</string>
  	
  	<string name="send_to">Send to..</string>
+ 	<string name="next">Next</string>
  	
  	<string name="no_sdcard">No SDCard found to backup notes.</string>
  	<string name="backup_title">Please wait.. backing up notes</string>
@@ -28,9 +31,9 @@
     <string name="pref_themes_title">Themes</string>
     <string name="pref_themes_summary">Set the notepad theme</string>
     <string name="pref_font_title">Font</string>
-    <string name="pref_font_summary">Set the font for the text</string>
+    <string name="pref_font_summary">Set the font for the text in the editor</string>
     <string name="pref_text_size_title">Text Size</string>
-    <string name="pref_text_size_summary">Set the size for the text</string>
+    <string name="pref_text_size_summary">Set the size for the text in the editor</string>
     <string name="pref_time_toDisplay_title">Date to display</string>
     <string name="pref_time_toDisplay_summary">Select if creation date or modified date to display</string>
     <string name="pref_sort_notes_title">Sort order</string>
@@ -46,6 +49,11 @@
     <string name="already_logged_in">This account has been already added</string>
     <string name="dropbox_subtitle">Sync all notes to your own dropbox account</string>
     
+    <string name="already_logged">Already Logged-in</string>
+    <string name="logout">Logout</string>
+    <string name="remove_added_dropbox_account">Do you want to log-out from your Dropbox account?</string>
+    <string name="remove_account_succesful">Account succesfully removed</string>
+    
     <string name="labels_manager">Label Manager</string>
     <string name="lables_title">Labels</string>
     <string name="lables_create_new_title">Create New Label</string>
@@ -57,6 +65,12 @@
     <string name="lables_pick_color">Pick a color for label : </string>
     
     <string name="select_cloud_options">Select a cloud storage</string>
-    <string name="login_into">Please login into atleast the storage account. Drag the left side panel or click on the icon on the Top-Left to select an option.</string>
+    <string name="login_into">Please login into atleast one account. Press OK to select a option.</string>
     
+    <string name="info">Info</string>
+    
+    <string name="welcome_msg">Welcome to Easy Notes</string>
+ 	<string name="change_log"><b>Change Log :</b>
+ 	    \n\n <b>v0.1</b> \n\t ● First Release 
+ 	    \n</string>
 </resources>

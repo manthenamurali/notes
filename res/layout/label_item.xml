@@ -13,11 +13,21 @@
         android:layout_marginRight="@dimen/side_pane_item_paddingleft2" />
 
     <TextView
+        android:id="@+id/lable_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/side_pane_item_paddingleft"
+        android:layout_toLeftOf="@id/lable_color"
+        android:textColor="@color/side_panel_item_text_color"
+        android:typeface="serif" />
+
+    <TextView
         android:id="@+id/lable_name"
         android:layout_width="fill_parent"
         android:layout_height="50dip"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/lable_color"
+        android:layout_toLeftOf="@id/lable_count"
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/side_pane_item_paddingleft2"

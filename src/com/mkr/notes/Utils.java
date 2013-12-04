@@ -11,6 +11,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
+import android.text.format.Formatter;
 import android.util.Log;
 
 public class Utils {
@@ -18,7 +19,7 @@ public class Utils {
 	public static final String DELIMITER =";;";
 	
 	private static Utils mUtils;
-	private Context mContext;
+	private static Context mContext;
 
 	private Typeface mRobotoSlabFont;
 	private Typeface mNoteFont; 
@@ -35,7 +36,7 @@ public class Utils {
 	public static Utils getInstance() {
 		if(mUtils == null) {
 			mUtils = new Utils();
-			mDateFormat = new SimpleDateFormat("MMM dd,yyyy");
+			mDateFormat = new SimpleDateFormat("EEE MMM dd yyyy");
 			mDate  = new Date();
 		}
 		return mUtils;
@@ -75,11 +76,13 @@ public class Utils {
 						String.valueOf(res.getColor(R.color.yellow_theme_line_color)) + DELIMITER +
 						String.valueOf(res.getColor(R.color.yellow_theme_background_color));
 				
-				Log.e("mkr","plain theme-->"+plainTheme);
-				Log.e("mkr","yellow theme-->"+yellowTheme);
+				final String greenTheme = String.valueOf(res.getColor(R.color.green_theme_text_color)) + DELIMITER +
+						String.valueOf(res.getColor(R.color.green_theme_line_color)) + DELIMITER +
+						String.valueOf(res.getColor(R.color.green_theme_background_color));
 				
 				edit.putString(SettingsActivity.PREF_THEME_PLAIN, plainTheme);
 				edit.putString(SettingsActivity.PREF_THEME_YELLOW, yellowTheme);
+				edit.putString(SettingsActivity.PREF_THEME_GREEN, greenTheme);
 				edit.commit();
 			}
 		}
@@ -96,6 +99,9 @@ public class Utils {
 		case SettingsActivity.THEME_YELLOW:
 			themeValue = sharedPref.getString(SettingsActivity.PREF_THEME_YELLOW, null);
 			break;
+		case SettingsActivity.THEME_GREEN:
+			themeValue = sharedPref.getString(SettingsActivity.PREF_THEME_GREEN, null);
+			break;
 		}  
 		
 		if(themeValue == null) {
@@ -106,6 +112,10 @@ public class Utils {
 		}
 		
 		return themeValue;
+	}
+	
+	public static String readableFileSize(long fileSize) {
+		return Formatter.formatFileSize(mContext, fileSize);
 	}
 	
 	public static String getReadableTime(final long millisec) {
