@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -17,9 +16,8 @@ import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
-import com.dropbox.client2.session.TokenPair;
 import com.dropbox.client2.session.Session.AccessType;
-import com.mkr.notes.NotesActivity;
+import com.dropbox.client2.session.TokenPair;
 import com.mkr.notes.R;
 
 public class Dropbox {

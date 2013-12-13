@@ -32,7 +32,7 @@ public class CustomEditText extends EditText {
 	@Override
     protected void onDraw(Canvas canvas) {
 		
-		int height = canvas.getHeight();
+		int height = canvas.getHeight() * 3;
         int curHeight = 0;
         final Rect r = mRect;
         final Paint paint = mPaint;
