@@ -23,7 +23,10 @@
  	
  	<string name="no_sdcard">No SDCard found to backup notes.</string>
  	<string name="backup_title">Please wait.. backing up notes</string>
- 	 
+ 	
+ 	<string name="menu_edit_note">Edit Note</string>
+ 	<string name="menu_title">Set Title</string>
+ 	
     <string name="select_font">Select Font</string>
     <string name="select_text_size">Select Text Size</string>
     <string name="select_theme">Select Theme</string>
@@ -44,10 +47,16 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     
+    <string name="tap_icon_to_edit">Tap on the edit icon to edit the note</string>
+     
+    <string name="save_to_dialog">Save Note</string>
+    <string name="save_to_dialog_msg">Enter some text in the subject filed to save the note</string>
+    
     <string name="sync_to">Sync to</string>
     <string name="dropbox_title">DropBox</string>
-    <string name="already_logged_in">This account has been already added</string>
-    <string name="dropbox_subtitle">Sync all notes to your own dropbox account</string>
+   
+    <string name="subtitle_login">Tap to Login</string>
+    <string name="subtitle_logout">Tap to Logout</string>
     
     <string name="already_logged">Already Logged-in</string>
     <string name="logout">Logout</string>

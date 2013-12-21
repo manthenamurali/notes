@@ -30,7 +30,7 @@ public class Dropbox {
 
 	private static DropboxAPI<AndroidAuthSession> mDBApi;
 
-	private boolean mIsAlreadyLoggedIn = false;
+	private static boolean mIsAlreadyLoggedIn = false;
 	private Context mContext;
 
 	final static private String ACCOUNT_PREFS_NAME = "prefs";
@@ -116,7 +116,7 @@ public class Dropbox {
 		}
 	}
 
-	public boolean isAlreadyLogged() {
+	public static boolean isAlreadyLogged() {
 		return mIsAlreadyLoggedIn;
 	}
 

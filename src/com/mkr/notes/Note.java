@@ -7,5 +7,6 @@ public class Note {
 	public long createDate;
 	public String NotePath;
 	public String NoteLabel;
+	public boolean hasTitle;
 	
 }

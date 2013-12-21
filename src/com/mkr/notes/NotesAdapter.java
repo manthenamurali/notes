@@ -70,8 +70,9 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 		final Note data = mListToDisplay.get(position);
 		holder.mCreationDate = data.createDate;
 		holder.mNotePath = data.NotePath;
-		holder.mNoteLabel = data.NoteLabel; 
-				
+		holder.mNoteLabel = data.NoteLabel;
+		
+		holder.mHasTitle = data.hasTitle;		
 		holder.mTitle.setText(data.title);
 		holder.mLabelColor.setBackgroundColor(LabelUtils.getLabelColor(data.NoteLabel));
 		
@@ -105,5 +106,6 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 		public long mCreationDate;
 		public String mNotePath;
 		public String mNoteLabel;
+		public boolean mHasTitle;
 	}
 }

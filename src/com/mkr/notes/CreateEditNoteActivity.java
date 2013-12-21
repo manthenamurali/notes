@@ -1,6 +1,7 @@
 package com.mkr.notes;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.Map;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Service;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -18,21 +19,20 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mkr.notes.labels.LabelUtils;
 import com.mkr.notesdatabase.NotesDBHelper;
@@ -57,15 +57,23 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 
 	private int mItemPosition;
 
+	private int mShouldInsertCustomTitle = 0;
+
+	private Menu mMenu;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.create_note_layout);
 		
+		mTitleEditText = (EditText) findViewById(R.id.create_edit_note_edittext_title);
+		mSubjectEditText = (CustomEditText) findViewById(R.id.create_edit_note_edittext_body);
+		
 		final Intent intent = getIntent();
 		String noteTitle = null;
 		String noteLabel = null;
+		boolean hasTitle = false;
 		
 		if(intent != null) {
 			mNoteActionType = intent.getIntExtra(NotesActivity.INTENT_KEY_NOTE_TYPE, NotesActivity.NOTE_CREATE);
@@ -73,14 +81,14 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 			mNotePath = intent.getStringExtra(NotesActivity.INTENT_KEY_NOTE_PATH);
 			noteTitle = intent.getStringExtra(NotesActivity.INTENT_KEY_NOTE_TITLE);
 			noteLabel = intent.getStringExtra(NotesActivity.INTENT_KEY_NOTE_LABEL);
-			
+			hasTitle = intent.getBooleanExtra(NotesActivity.INTENT_KEY_HAS_TITLE, false);
 		}
 
 		final ActionBar actionBar = getActionBar();
 		if(actionBar != null) {
 			actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME /*| ActionBar.DISPLAY_SHOW_TITLE*/);
 			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-			actionBar.setDisplayHomeAsUpEnabled(true);
+			actionBar.setDisplayHomeAsUpEnabled(false);
 
 			View layout = getLayoutInflater().inflate(R.layout.create_note_actionbar, null);
 			mProgressBar = (ProgressBar) layout.findViewById(R.id.create_note_progressbar);
@@ -105,19 +113,22 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 		actionBar.setSelectedNavigationItem(mItemPosition);	    
 		
 		if(mNoteActionType == NotesActivity.NOTE_EDIT) {
-			if(noteTitle != null) {
-				//actionBar.setTitle(noteTitle);
+			if(hasTitle) {
+				mTitleEditText.setVisibility(View.VISIBLE);
+				mTitleEditText.setText(noteTitle);
 			}
+			
+			mSubjectEditText.setFocusable(false);
+			mTitleEditText.setFocusable(false);
+			
 			DisplaySavedNote displayNote = new DisplaySavedNote();
 			displayNote.execute(mNotePath);
-		}  else {
-			if(actionBar != null) {
-				actionBar.setTitle("New Note");
-			}
+			
+			Toast.makeText(CreateEditNoteActivity.this, getString(R.string.tap_icon_to_edit), Toast.LENGTH_LONG).show();
+		} else {
+			mSubjectEditText.setFocusable(true);
+			mSubjectEditText.requestFocus();
 		}
-
-		mTitleEditText = (EditText) findViewById(R.id.create_edit_note_edittext_title);
-		mSubjectEditText = (CustomEditText) findViewById(R.id.create_edit_note_edittext_body);
 	}
 
 	@Override
@@ -127,12 +138,28 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 		mSubjectEditText.applytheme();
 		mSubjectEditText.setTypeface(Utils.getInstance().getNoteFont());
 		mSubjectEditText.setTextSize(Utils.getInstance().getNoteFontSize());
+		
+		mTitleEditText.setTypeface(Utils.getInstance().getNoteFont());
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflator = getMenuInflater();
 		inflator.inflate(R.menu.create_edit_menu, menu);
+		
+		mMenu = menu;
+		
+		final MenuItem editMenu = menu.findItem(R.id.menu_edit_note); 
+		final MenuItem titleMenu = menu.findItem(R.id.menu_title);
+		
+		if(mNoteActionType == NotesActivity.NOTE_EDIT) {
+			editMenu.setVisible(true);
+			titleMenu.setEnabled(false);
+		} else {
+			editMenu.setVisible(false);
+			titleMenu.setEnabled(true);
+		}
+		
 		return true;
 	}
 
@@ -141,7 +168,35 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			final Intent i = new Intent(CreateEditNoteActivity.this, NotesActivity.class);
+			i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 			startActivity(i);
+			break;
+		case R.id.menu_edit_note:
+			
+			mTitleEditText.setFocusable(true);
+			mTitleEditText.setFocusableInTouchMode(true);
+			
+			mSubjectEditText.setFocusable(true);
+			mSubjectEditText.setFocusableInTouchMode(true);
+			mSubjectEditText.requestFocus();
+			
+			final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+			
+			final MenuItem editMenu = mMenu.findItem(R.id.menu_edit_note); 
+			final MenuItem titleMenu = mMenu.findItem(R.id.menu_title);
+
+			editMenu.setVisible(false);
+			editMenu.setEnabled(false);
+			
+			titleMenu.setEnabled(true);
+
+			break;
+		case R.id.menu_title:
+			if(mTitleEditText.getVisibility() != View.VISIBLE) {
+				mTitleEditText.setVisibility(View.VISIBLE);
+				mTitleEditText.requestFocus();
+			}
 			break;
 		case R.id.menu_font:
 			displayFonts();
@@ -187,6 +242,8 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 				Utils.getInstance().loadNoteFont(which);
 				mSubjectEditText.setTypeface(Utils.getInstance().getNoteFont());
 				mSubjectEditText.invalidate();
+				
+				mTitleEditText.setTypeface(Utils.getInstance().getNoteFont());
 			}
 		});
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -273,7 +330,7 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
 			saveNoteAndEnterIntoDB();
-		}
+		} 
 		return super.onKeyDown(keyCode, event);
 	}
 
@@ -289,6 +346,11 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 				serviceIntent.putExtra("text", text);
 				serviceIntent.putExtra("filepath", mNotePath);
 				startService(serviceIntent);
+			} else {
+				final File fileToDelete = new File(mNotePath);
+				if(fileToDelete != null && fileToDelete.exists()) {
+					fileToDelete.delete();
+				}
 			}
 		}
 	}
@@ -297,15 +359,17 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 		mNoteModifiedtime = System.currentTimeMillis();
 		final String title = getNoteTitle();
 		NotesDBHelper dbHelper = NotesDBHelper.getInstance(CreateEditNoteActivity.this);
-		dbHelper.insertNewNote(mNoteCreationtime, mNoteModifiedtime, title, mNotePath, mValuesList.get(mItemPosition));
+		dbHelper.insertNewNote(mNoteCreationtime, mNoteModifiedtime, title, mNotePath, mValuesList.get(mItemPosition), mShouldInsertCustomTitle);
 	}
 
 	public String getNoteTitle() {
+		mShouldInsertCustomTitle = 0;
 		String title = null; 
 		final Editable titleText = mTitleEditText.getText();
 		if(titleText != null) {
 			final String str = titleText.toString();
 			if(!TextUtils.isEmpty(str)) {
+				mShouldInsertCustomTitle = 1;
 				title = str;
 			}  else {
 				final String text = mSubjectEditText.getText().toString();

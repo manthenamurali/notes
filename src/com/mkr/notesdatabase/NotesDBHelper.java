@@ -22,7 +22,8 @@ public class NotesDBHelper {
 				SQLiteHelper.COLUMN_MODIFIED_TIME,
 				SQLiteHelper.COLUMN_NOTE_TITLE, 
 				SQLiteHelper.COLUMN_NOTE_PATH,
-				SQLiteHelper.COLUMN_NOTE_LABEL
+				SQLiteHelper.COLUMN_NOTE_LABEL,
+				SQLiteHelper.COLUMN_HAS_CUSTOM_TITLE
 			};
 
 	/**
@@ -46,7 +47,7 @@ public class NotesDBHelper {
 	}
 
 	public void insertNewNote(final long createTime, final long modifiedTime, final String noteTitle,
-			final String notePath, final String label) {
+			final String notePath, final String label, final int isTitleSelected) {
 
 		final ContentValues values = new ContentValues();
 		values.put(SQLiteHelper.COLUMN_CREATED_TIME, createTime);
@@ -54,6 +55,8 @@ public class NotesDBHelper {
 		values.put(SQLiteHelper.COLUMN_NOTE_TITLE, noteTitle);
 		values.put(SQLiteHelper.COLUMN_NOTE_PATH, notePath);
 		values.put(SQLiteHelper.COLUMN_NOTE_LABEL, label);
+		//1 = true, 0= false
+		values.put(SQLiteHelper.COLUMN_HAS_CUSTOM_TITLE, isTitleSelected);
 
 		if(mSQLWritableDatabase.isOpen()) {
 			final long rowID = mSQLWritableDatabase.insert(SQLiteHelper.TABLE_NAME, null, values);
@@ -82,6 +85,8 @@ public class NotesDBHelper {
 				note.title = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_TITLE));
 				note.NotePath = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_PATH));
 				note.NoteLabel = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_LABEL));
+				final int hasCustomTitle = Integer.valueOf(cursor.getInt(cursor.getColumnIndex(SQLiteHelper.COLUMN_HAS_CUSTOM_TITLE)));
+				note.hasTitle = hasCustomTitle == 1 ? true : false; 
 				notesList.add(note);
 				
 				mNotesInfo.put(note.createDate, note);

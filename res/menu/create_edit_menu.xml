@@ -2,6 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_edit_note"
+        android:icon="@drawable/ic_edit"
+        android:showAsAction="always"
+        android:title="@string/menu_edit_note"/>
+    
+    <item
+        android:id="@+id/menu_title"
+        android:title="@string/menu_title"/>
+    
+    <item
         android:id="@+id/menu_font"
         android:title="@string/pref_font_title"/>
     

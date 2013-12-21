@@ -16,6 +16,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_NOTE_TITLE = "title";
 	public static final String COLUMN_NOTE_PATH = "note_path";
 	public static final String COLUMN_NOTE_LABEL = "note_label";
+	public static final String COLUMN_HAS_CUSTOM_TITLE = "note_hastitle";
 
 	public SQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -28,7 +29,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 				+ COLUMN_MODIFIED_TIME + " datetime,"
 				+ COLUMN_NOTE_TITLE + " VARCHAR,"
 				+ COLUMN_NOTE_PATH + " VARCHAR," 
-				+ COLUMN_NOTE_LABEL + " VARCHAR);");
+				+ COLUMN_NOTE_LABEL + " VARCHAR,"
+				+ COLUMN_HAS_CUSTOM_TITLE + " INTEGER);");
 	}
 
 	@Override

@@ -61,6 +61,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mkr.cloud.CloudUtils;
+import com.mkr.cloud.Dropbox;
 import com.mkr.notes.NotesAdapter.Holder;
 import com.mkr.notes.labels.LabelUtils;
 import com.mkr.notes.labels.LabelsActivity;
@@ -77,6 +78,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	public static final String INTENT_KEY_MODIFIED_TIME  =  "modified_time";
 	public static final String INTENT_KEY_NOTE_PATH  	 =  "note_path";
 	public static final String INTENT_KEY_NOTE_LABEL  	 =  "note_label";
+	public static final String INTENT_KEY_HAS_TITLE  	 =  "note_has_title";
 
 	public static final String NOTES_PARENT_DIR_NAME = "notes";
 
@@ -93,8 +95,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	private List<Long> mSelectedItemsList;
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
-	
-	private Note mSelectedNote;
 	
 	private AlertDialog mHeplpTutorialAlertDialog;
 	private int mHelpTutorialPage;
@@ -165,6 +165,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				i.putExtra(INTENT_KEY_MODIFIED_TIME, -1);
 				i.putExtra(INTENT_KEY_NOTE_PATH, holder.mNotePath);
 				i.putExtra(INTENT_KEY_NOTE_LABEL, holder.mNoteLabel);
+				i.putExtra(INTENT_KEY_HAS_TITLE, holder.mHasTitle);
 				startActivity(i);
 			}
 		});
@@ -471,7 +472,11 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	private void updateSidePaneLayout() {
 		final RelativeLayout dropBoxView = (RelativeLayout) findViewById(R.id.side_pane_item_dropbox);
 		((TextView) dropBoxView.findViewById(R.id.side_pane_item_title)).setText(getString(R.string.dropbox_title));
-		((TextView) dropBoxView.findViewById(R.id.side_pane_item_summary)).setText(getString(R.string.dropbox_subtitle));
+		if(!Dropbox.isAlreadyLogged()) {
+			((TextView) dropBoxView.findViewById(R.id.side_pane_item_summary)).setText(getString(R.string.subtitle_login));
+		} else {
+			((TextView) dropBoxView.findViewById(R.id.side_pane_item_summary)).setText(getString(R.string.subtitle_logout));
+		}
 		
 		final LinearLayout labelsParent = (LinearLayout) findViewById(R.id.labels_parent_linear_layout);
 		labelsParent.removeAllViews();
@@ -510,7 +515,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			labelsParent.addView(lableLayout);
 		}
 		
-		((TextView) dropBoxView.findViewById(R.id.side_pane_item_title)).setOnClickListener(new View.OnClickListener() {
+		dropBoxView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mDrawerLayout.closeDrawers();

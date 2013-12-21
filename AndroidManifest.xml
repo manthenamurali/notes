@@ -26,10 +26,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.mkr.notes.SettingsActivity" />
+        
+        <activity android:name="com.mkr.notes.SettingsActivity"
+            android:noHistory="true" />
+        
         <activity android:name="com.mkr.notes.labels.LabelsActivity"
-            		android:screenOrientation="portrait"/>
+            android:noHistory="true"
+            android:screenOrientation="portrait"/>
+        
         <activity android:name="com.mkr.notes.CreateEditNoteActivity"
+            android:configChanges="orientation"
             android:windowSoftInputMode="adjustResize" />
 
         <activity android:name="com.dropbox.sync.android.DbxAuthActivity" />
