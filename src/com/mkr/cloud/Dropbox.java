@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -22,8 +23,8 @@ import com.mkr.notes.R;
 
 public class Dropbox {
 
-	private static final String APP_KEY = "sfd9vcuutx9iufd";
-	private static final String APP_SECRET = "8p1wcfh6nq4cbn2";
+	private static final String APP_KEY = "a7zsxo6a4osnne4";
+	private static final String APP_SECRET = "by27ckiotjiz704";
 	private static final AccessType ACCESS_TYPE = AccessType.DROPBOX;
 
 	private static Dropbox mDropbox;
@@ -33,10 +34,12 @@ public class Dropbox {
 	private static boolean mIsAlreadyLoggedIn = false;
 	private Context mContext;
 
-	final static private String ACCOUNT_PREFS_NAME = "prefs";
-	final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
-	final static private String ACCESS_SECRET_NAME = "ACCESS_SECRET";
+	private static final String ACCOUNT_PREFS_NAME = "prefs";
+	private static final String ACCESS_KEY_NAME = "ACCESS_KEY";
+	private static final String ACCESS_SECRET_NAME = "ACCESS_SECRET";
 
+	private static final String DROPBOX_FOLDER_NAME = "EasyNotes";
+	
 	private Dropbox() { }
 
 	public static Dropbox getInstance() {
@@ -147,10 +150,17 @@ public class Dropbox {
 		edit.commit();
 	}
 
-	public void uploadFile(final File file) {
+	public void uploadFile(final File file, final String title) {
+		//create a folder to save files
+		try {
+			mDBApi.createFolder(DROPBOX_FOLDER_NAME);
+		} catch (DropboxException e) {
+			//e.printStackTrace();
+		}
+		
 		try {
 			final FileInputStream inputStream = new FileInputStream(file);
-			Entry response = mDBApi.putFile(file.getAbsolutePath(), inputStream, file.length(), null, null); 
+			Entry response = mDBApi.putFile(DROPBOX_FOLDER_NAME+ "/" + title, inputStream, file.length(), null, null); 
 			Log.e("mkr","Response-->"+response.path);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

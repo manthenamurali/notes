@@ -1,15 +1,22 @@
 package com.mkr.cloud;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.Map;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Shader.TileMode;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.mkr.notes.Note;
 import com.mkr.notes.NotesActivity;
 import com.mkr.notes.R;
+import com.mkr.notes.Utils;
+import com.mkr.notesdatabase.NotesDBHelper;
 
 public class CloudUtils {
 
@@ -127,8 +134,17 @@ public class CloudUtils {
 			switch (storageType) {
 			case R.string.dropbox_title:
 				
-				for (int i = 0; i < filesToUpload.length; i++) {
-					mDropbox.uploadFile(filesToUpload[i]);
+				final int length = filesToUpload.length;
+				final Map<Long, Note> notesMap = NotesDBHelper.getCurrentNotesMap();
+				
+				for (int i = 0; i < length; i++) {
+					final String fileNameWithoutExt = Utils.getOnlyFileName(filesToUpload[i].getName());
+					final Note note = notesMap.get(Long.valueOf(fileNameWithoutExt));
+					String title = filesToUpload[i].getName(); 
+					if(note != null && note.title != null) {
+						title = note.title +".txt";
+					}
+					mDropbox.uploadFile(filesToUpload[i], title);
 				}
 				
 				break;

@@ -183,4 +183,24 @@ public class Utils {
 	public float getNoteFontSize() {
 		return mNoteFontSize;
 	}
+	
+	/**
+	 * return only the file name without any extension
+	 * 
+	 * @param fileName file name
+	 * @return only file name without extension 
+	 */
+	public static String getOnlyFileName(String fileName) {
+		if(!fileName.contains(".")) {
+			return fileName;
+		}
+
+		int lastIndex = fileName.lastIndexOf('.');
+		//if dot is in 0th place it is hidden file so display full name
+		if(lastIndex == 0) {
+			lastIndex = fileName.length() - 1;
+		}
+		return fileName.substring(0, lastIndex); 
+	}
+	
 }
