@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,6 +18,7 @@ import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.TokenPair;
+import com.mkr.notes.NotesActivity;
 import com.mkr.notes.R;
 
 public class Dropbox {
@@ -155,13 +155,14 @@ public class Dropbox {
 		try {
 			mDBApi.createFolder(DROPBOX_FOLDER_NAME);
 		} catch (DropboxException e) {
+			//folder alreay exists
 			//e.printStackTrace();
 		}
 		
 		try {
 			final FileInputStream inputStream = new FileInputStream(file);
 			Entry response = mDBApi.putFile(DROPBOX_FOLDER_NAME+ "/" + title, inputStream, file.length(), null, null); 
-			Log.e("mkr","Response-->"+response.path);
+			Log.e(NotesActivity.TAG,"Dropbox Response-->"+response.path);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (DropboxException e) {

@@ -13,7 +13,6 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.Service;
@@ -38,7 +37,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -49,14 +47,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.TextView.BufferType;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,6 +65,8 @@ import com.mkr.notesdatabase.NotesDBHelper;
 
 public class NotesActivity extends Activity implements OnSharedPreferenceChangeListener {
 
+	public static final String TAG = "Easy Notes";
+	
 	public static final int NOTE_CREATE = 0;
 	public static final int NOTE_EDIT = 1;
 
@@ -130,7 +128,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		mTextview = (TextView) findViewById(R.id.notes_message_textview);
 		mNotesListView = (ListView) findViewById(R.id.notes_list_view);
 
-		mTextview.setTypeface(utils.getRobotoSlabFontTypeface());
+		mTextview.setTypeface(utils.getFontTypefaceForTitles());
 		mNotesListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -218,7 +216,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		sPref.registerOnSharedPreferenceChangeListener(this);
 		
 		updateSidepaneHandler.sendEmptyMessage(0);
-		//updateSidePaneLayout();
 		
 		final boolean shouldDispChangeLog = sPref.getBoolean(SettingsActivity.PREF_FIRST_LAUNCH, true);
 		if(shouldDispChangeLog) {
@@ -238,7 +235,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		super.onConfigurationChanged(newConfig);
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
-	 
 	
 	@Override
 	protected void onResume() {
@@ -253,6 +249,9 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		}
 	}
 
+	/**
+	 * create a notes folder in the internal storage in which all the notes will be saved
+	 */
 	private void createNotesFolder() {
 		File file = new File(INTERNAL_STORAGE_PATH);
 		if(!file.exists()) {
@@ -260,15 +259,18 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		}
 	}
 
+	/**
+	 * create a new note in the internal storage
+	 * @param creationTime
+	 * @return
+	 */
 	private String createNewNoteFile(final long creationTime) {
 		final String fileToCreatePath = INTERNAL_STORAGE_PATH + "/" + creationTime+".txt";
 		final File fileToCreate = new File(fileToCreatePath);
-		boolean creationStatus; 
 		try {
-			creationStatus = fileToCreate.createNewFile();
+			fileToCreate.createNewFile();
 		} catch (IOException e) {
-			e.printStackTrace();
-			creationStatus = false;
+			//e.printStackTrace();
 		}
 		return fileToCreatePath;
 	}
@@ -280,7 +282,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		return true;
 	} 
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -315,7 +316,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		}
 		return true;
 	}
-
 
 	private ActionMode.Callback ActionModeCallback = new ActionMode.Callback() {
 		@Override
@@ -423,6 +423,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.select_cloud_options));
 		final String[] options = CloudUtils.getInstance().getAllInstalledCloudOptions();
+		//if no cloud storage are selected yet display a user asking to login to atleast one account
 		if(options == null) {
 			builder.setMessage(getString(R.string.login_into));
 		} else {
@@ -437,6 +438,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				if(options == null) {
+					//display the side panel so that the user can login into one cloud storage
 					mDrawerLayout.openDrawer(Gravity.LEFT);
 				} else {
 					if(CloudUtils.getInstance().isNetworkConnected()) {
@@ -457,13 +459,11 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-
 			}
 		});
 
 		builder.create().show();
 	}
-	
 	
 	private void updateSidePaneLayout() {
 		final RelativeLayout dropBoxView = (RelativeLayout) findViewById(R.id.side_pane_item_dropbox);
@@ -539,22 +539,29 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			//also delete the file from internal storage
 			fileToDelete = new File(INTERNAL_STORAGE_PATH + "/" + val + ".txt");
 			if(fileToDelete.exists()) {
-				 final boolean result = fileToDelete.delete();
-				 //Log.e("mkr","File at " + fileToDelete.getPath() + " is deleted ? " + result);
+				 fileToDelete.delete();
 			}
 		}
 	}
 	
+	/**
+	 * backup the selected files into the sdcard
+	 * @param files
+	 */
 	private void backupSelectedNotes(final File[] files) {
 		final String storageState = Environment.getExternalStorageState();
-		Log.e("kpt","Storage state--->"+storageState);
 		if(!storageState.equals(Environment.MEDIA_MOUNTED)) {
 			Toast.makeText(NotesActivity.this, getString(R.string.no_sdcard), Toast.LENGTH_LONG).show();
 			return;
 		}
-		
 		new BackupFiles().execute(files);
 	}
+	
+	Handler updateSidepaneHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			updateSidePaneLayout();
+		};
+	};
 	
 	class BackupFiles extends AsyncTask<File, Void, Void> {
 		private ProgressDialog pd;
@@ -571,32 +578,27 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			//check if any folder is already created
 			final String externalStoragePath = Environment.getExternalStorageDirectory().getPath();
 			final File folder = new File(externalStoragePath +"/"+ getString(R.string.app_name));
-			Log.e("kpt","backup folder path--->"+folder.getPath() +" is exists-->"+folder.exists());
 			if(!folder.exists()) {
 				folder.mkdirs();
 			}
 			
 			final Map<Long, Note> notesMap = NotesDBHelper.getCurrentNotesMap();
 			for (final File file : params) {
-				Log.e("mkr","files path-->"+file.getPath());
-				
 				final String fileNameWithoutExt = Utils.getOnlyFileName(file.getName());
 				final Note note = notesMap.get(Long.valueOf(fileNameWithoutExt));
 				String title = file.getName(); 
 				if(note != null && note.title != null) {
 					title = note.title +".txt";
 				}
-				
+				//save based on the title note, if unable save based on the creation time
 				saveNote(file.getPath(), folder.getPath()+"/"+title);
 			}
-			
 			return null;
 		}
 
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			
 			pd.dismiss();
 		}
 		
@@ -618,12 +620,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			}
 		}
 	}
-	
-	Handler updateSidepaneHandler = new Handler() {
-		public void handleMessage(Message msg) {
-			updateSidePaneLayout();
-		};
-	};
 	
 	class DisplaySavedLists extends AsyncTask<Void, Void, Void> {
 
@@ -655,7 +651,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				mTextview.setVisibility(View.VISIBLE);
 
 				SpannableStringBuilder msgToDisplay = new SpannableStringBuilder("\nTap on   icon to create new note.");
-				Bitmap smiley = BitmapFactory.decodeResource( getResources(), R.drawable.ic_add_gray);
+				Bitmap smiley = BitmapFactory.decodeResource( getResources(), R.drawable.ic_add);
 				msgToDisplay.setSpan(new ImageSpan( smiley ), 8, 9, Spannable.SPAN_INCLUSIVE_INCLUSIVE );
 				mTextview.setText(msgToDisplay);
 

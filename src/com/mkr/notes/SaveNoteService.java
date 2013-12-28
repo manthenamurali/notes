@@ -7,8 +7,12 @@ import java.io.IOException;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
+/**
+ * this is the service which saves the note in the internal storage
+ * @author murali
+ *
+ */
 public class SaveNoteService extends Service {
 
 	private String mNotePath;
@@ -30,6 +34,10 @@ public class SaveNoteService extends Service {
 		return 0;
 	}
 	
+	/**
+	 * save the note 
+	 * @param body text to write into file
+	 */
 	public void saveNote(final String body) {
 		BufferedWriter writer = null;
 		try {

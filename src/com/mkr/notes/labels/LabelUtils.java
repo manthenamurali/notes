@@ -9,6 +9,12 @@ import android.content.res.Resources;
 
 import com.mkr.notes.R;
 
+/**
+ * this is a utils class used specifically only for labels like creating a label and deleting labels 
+ * 
+ * @author murali
+ *
+ */
 public class LabelUtils {
 
 	private static LabelUtils mLabelUtils;
@@ -17,6 +23,7 @@ public class LabelUtils {
 	
 	private static Map<String, ?> mSavedLabels;
 	
+	//private constructor
 	private LabelUtils() { }
 	
 	public static LabelUtils getInstance() {
@@ -31,6 +38,9 @@ public class LabelUtils {
 		createDefaultLablePreferences();
 	}
 	
+	/**
+	 * create all the default label shared preferences and their respective colors
+	 */
 	private static void createDefaultLablePreferences() {
 		mSharedPref = mContext.getSharedPreferences(LabelsActivity.LABELS_SHARED_PREF, Context.MODE_PRIVATE);
 		final Map<String, ?> savedLabels = mSharedPref.getAll(); 
@@ -42,8 +52,6 @@ public class LabelUtils {
 			edit.putInt(LabelsActivity.LABELS_DEFAULT_IDEAS, res.getColor(R.color.label_color_ideas));
 			edit.commit();
 		}
-		
-		getAllSavedLables();
 	}
 	
 	public static Map<String, ?> getAllSavedLables() {

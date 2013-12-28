@@ -1,7 +1,5 @@
 package com.mkr.notes;
 
-import com.mkr.notes.labels.LabelsActivity;
-
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -26,11 +24,11 @@ public class SettingsActivity extends PreferenceActivity{
 	public static final int THEME_YELLOW	        	=  1;
 	public static final int THEME_GREEN	        		=  2;
 	
-	public static final String PREF_DATE_TO_DISPLAY 		= "notes_time_type";
-	public static final String PREF_LIST_SORT_TYPE 			= "notes_sort_type";
-	public static final String PREF_TEXT_SIZE 				= "text_size";
-	public static final String PREF_TEXT_FONT 				= "text_font";
-	public static final String PREF_THEME	 				= "theme";
+	public static final String PREF_DATE_TO_DISPLAY 	= "notes_time_type";
+	public static final String PREF_LIST_SORT_TYPE 		= "notes_sort_type";
+	public static final String PREF_TEXT_SIZE 			= "text_size";
+	public static final String PREF_TEXT_FONT 			= "text_font";
+	public static final String PREF_THEME	 			= "theme";
 
 	public static final int TEXT_SIZE_SMALL 		= 0;
 	public static final int TEXT_SIZE_MEDIUM  		= 1;
@@ -44,7 +42,7 @@ public class SettingsActivity extends PreferenceActivity{
 	public static final int DATE_TYPE_MODIFIED  	= 0;
 	public static final int DATE_TYPE_CREATED 		= 1;
 	
-	public static final String PREF_FIRST_LAUNCH   			= "first_launch";
+	public static final String PREF_FIRST_LAUNCH   	= "first_launch";
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -103,7 +101,7 @@ public class SettingsActivity extends PreferenceActivity{
 	 * display the about dialog in settings
 	 */
 	private void displayAboutDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+		final AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
 		builder.setTitle(getString(R.string.app_name));
 		
 		View view = getLayoutInflater().inflate(R.layout.about, null);

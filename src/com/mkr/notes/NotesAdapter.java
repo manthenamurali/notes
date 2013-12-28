@@ -3,19 +3,24 @@ package com.mkr.notes;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mkr.notes.labels.LabelUtils;
-
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.mkr.notes.labels.LabelUtils;
+
 public class NotesAdapter extends android.widget.BaseAdapter {
 
 	private final Context mContext;
+	/**
+	 * all the notes that are to be displayed
+	 */
 	private final ArrayList<Note> mListToDisplay;
+	/**
+	 *  these are the items that are long pressed. change the background color for this items
+	 */
 	private List<Long> mSelectedList;
 	
 	public NotesAdapter(final Context context, final ArrayList<Note> data) {
@@ -43,7 +48,6 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 		notifyDataSetChanged();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Holder holder;
@@ -58,9 +62,9 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 			holder.mListParent = (RelativeLayout) convertView.findViewById(R.id.list_item_relative);
 			holder.mLabelColor = (TextView) convertView.findViewById(R.id.label_color);
 			
-			holder.mTitle.setTypeface(Utils.getInstance().getRobotoSlabFontTypeface());
-			holder.mMonth.setTypeface(Utils.getInstance().getRobotoSlabFontTypeface());
-			holder.mDate.setTypeface(Utils.getInstance().getRobotoSlabFontTypeface());
+			holder.mTitle.setTypeface(Utils.getInstance().getFontTypefaceForTitles());
+			holder.mMonth.setTypeface(Utils.getInstance().getFontTypefaceForTitles());
+			holder.mDate.setTypeface(Utils.getInstance().getFontTypefaceForTitles());
 			
 			convertView.setTag(holder);
 		} else {
@@ -88,9 +92,9 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 		holder.mDay.setText(date.substring(0, 3));
 				
 		if(mSelectedList != null && mSelectedList.contains(data.createDate)) {
-			holder.mListParent.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.background_selected));
+			holder.mListParent.setBackground(mContext.getResources().getDrawable(R.drawable.background_selected));
 		} else {
-			holder.mListParent.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.background));
+			holder.mListParent.setBackground(mContext.getResources().getDrawable(R.drawable.background));
 		}
 		
 		return convertView;

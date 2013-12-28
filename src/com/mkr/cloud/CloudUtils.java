@@ -18,6 +18,11 @@ import com.mkr.notes.R;
 import com.mkr.notes.Utils;
 import com.mkr.notesdatabase.NotesDBHelper;
 
+/**
+ * this is the utile class to the clout storage options like dropbox, drive etcc..
+ * @author murali
+ *
+ */
 public class CloudUtils {
 
 	public static final int STORAGE_DROPBOX = 0;
@@ -45,7 +50,6 @@ public class CloudUtils {
 	
 	public void loginIntoDropBox(final NotesActivity activity) {
 		if(Dropbox.isAlreadyLogged()) {
-			//Toast.makeText(mContext, mContext.getResources().getString(R.string.already_logged_in), Toast.LENGTH_LONG).show();
 			displayAlertDialog(mContext.getResources().getString(R.string.dropbox_title));
 		} else {
 			setDropboxLoginState(true);

@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.EditText;
 
 public class CustomEditText extends EditText {
@@ -48,9 +47,12 @@ public class CustomEditText extends EditText {
         super.onDraw(canvas);
     }
 	
+	/**
+	 * apply the theme to the edit text
+	 */
 	public void applytheme() {
 		
-		final String themeValue = Utils.getInstance().loadTheme();
+		final String themeValue = Utils.getInstance().getNoteTheme();
 		final String[] values = themeValue.split(Utils.DELIMITER);
 		
 		mTextColor = Integer.parseInt(values[0]);

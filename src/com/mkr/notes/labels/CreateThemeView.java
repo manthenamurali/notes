@@ -14,9 +14,10 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class CreateThemeView extends View {
-	Paint paint;
-	Shader luar;
-	final float[] color = { 1.f, 1.f, 1.f };
+	
+	private Paint paint;
+	private Shader luar;
+	private final float[] color = { 1.f, 1.f, 1.f };
 	
 	public CreateThemeView(Context context) {
 		super(context);
@@ -30,7 +31,9 @@ public class CreateThemeView extends View {
 		super(context, attrs, defStyle);
 	}
 
-	@SuppressLint("DrawAllocation") @Override protected void onDraw(Canvas canvas) {
+	@SuppressLint("DrawAllocation") 
+	@Override 
+	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		if (paint == null) {
 			paint = new Paint();
@@ -44,7 +47,7 @@ public class CreateThemeView extends View {
 		canvas.drawRect(0.f, 0.f, this.getMeasuredWidth(), this.getMeasuredHeight(), paint);
 	}
 
-	void setHue(float hue) {
+	protected void setHue(float hue) {
 		color[0] = hue;
 		invalidate();
 	}

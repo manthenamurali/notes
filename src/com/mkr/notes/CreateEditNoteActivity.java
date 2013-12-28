@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -439,7 +438,6 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		mItemPosition = itemPosition;
-		Log.e("kpt","item position-->"+mLabelsList.get(mItemPosition));
 		return true;
 	}
 }

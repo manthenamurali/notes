@@ -8,6 +8,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -21,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,7 +41,10 @@ public class LabelsActivity extends Activity {
 	public static final String LABELS_DEFAULT_WORK = "Work";
 	public static final String LABELS_DEFAULT_IDEAS = "Ideas";
 
+	//adapter that displays the created labels
 	private LabelsAdapter mLabelAdapter;
+	
+	//all the below views are related to custom theme which displays the colors 
 	private CreateThemeView mViewSatVal;
 	private View mViewHue;
 	private ImageView mViewCursor;
@@ -92,12 +97,18 @@ public class LabelsActivity extends Activity {
 		return true;
 	}
 
+	/**
+	 * display the create new label dialog. 
+	 */
 	private void createNewLabel() {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(LabelsActivity.this);
 		builder.setTitle(getString(R.string.lables_create_new_title));
 
+		final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		
 		final View dialogView = getLayoutInflater().inflate(R.layout.new_lable_dialog_layout, null);
-
+		final EditText edit = (EditText)dialogView.findViewById(R.id.create_lable_edit_text);
+		
 		mViewHue = dialogView.findViewById(R.id.theme_viewHue);
 		mViewSatVal = (CreateThemeView) dialogView.findViewById(R.id.theme_viewSatBri);
 		mViewCursor = (ImageView) dialogView.findViewById(R.id.theme_select_cursor);
@@ -112,6 +123,10 @@ public class LabelsActivity extends Activity {
 						|| event.getAction() == MotionEvent.ACTION_DOWN
 						|| event.getAction() == MotionEvent.ACTION_UP) {
 
+					if(event.getAction() == MotionEvent.ACTION_DOWN) {
+						imm.hideSoftInputFromWindow(edit.getWindowToken(), 0);
+					}
+					
 					float y = event.getY();
 					if (y < 0.f) y = 0.f;
 					if (y > mViewHue.getMeasuredHeight()) y = mViewHue.getMeasuredHeight() - 0.001f; // to avoid looping from end to start.
@@ -135,6 +150,10 @@ public class LabelsActivity extends Activity {
 						|| event.getAction() == MotionEvent.ACTION_DOWN
 						|| event.getAction() == MotionEvent.ACTION_UP) {
 
+					if(event.getAction() == MotionEvent.ACTION_DOWN) {
+						imm.hideSoftInputFromWindow(edit.getWindowToken(), 0);
+					}
+					
 					float x = event.getX(); // touch event are in dp units.
 					float y = event.getY();
 
@@ -167,8 +186,8 @@ public class LabelsActivity extends Activity {
 
 		builder.setView(dialogView);
 
-		final EditText edit = (EditText)dialogView.findViewById(R.id.create_lable_edit_text);
-
+		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+		
 		builder.setPositiveButton(getString(R.string.lables_create), new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -293,6 +312,11 @@ public class LabelsActivity extends Activity {
 		builder.create().show();
 	}
 	
+	/**
+	 * adapter displays all the labels
+	 * @author murali
+	 *
+	 */
 	class LabelsAdapter extends BaseAdapter {
 
 		private Map<String, ?> mLabelsMap;
@@ -311,6 +335,7 @@ public class LabelsActivity extends Activity {
 			final Iterator<String> keysIterator = mLabelsMap.keySet().iterator();
 			
 			mLabelNames = new ArrayList<String>();
+			//make sure that the labels are always added in the same order
 			mLabelNames.add(0, LabelsActivity.LABELS_DEFAULT_PERSONAL);
 			mLabelNames.add(1, LabelsActivity.LABELS_DEFAULT_WORK);
 			mLabelNames.add(2, LabelsActivity.LABELS_DEFAULT_IDEAS);
@@ -360,22 +385,24 @@ public class LabelsActivity extends Activity {
 
 			final String labelName = mLabelNames.get(position);
 			holder.mLabelName.setText(labelName);
-			holder.mLabelColor.setBackgroundColor((Integer)mLabelsMap.get(labelName));
-			holder.mDelIcon.setContentDescription(labelName);
+			//this is just a safety try catch. there will always be a color to a label 
+			try {
+				holder.mLabelColor.setBackgroundColor((Integer)mLabelsMap.get(labelName));
+			}catch(Exception e) {  
+				holder.mLabelColor.setBackgroundColor(Color.GREEN);
+			}
 			if(LABELS_DEFAULT_PERSONAL.equals(labelName) 
 					|| LABELS_DEFAULT_WORK.equals(labelName) 
 					|| LABELS_DEFAULT_IDEAS.equals(labelName)) {
-				holder.isDefaultLabel = true;
 				holder.mDelIcon.setVisibility(View.INVISIBLE);
 			} else {
-				holder.isDefaultLabel = false;
 				holder.mDelIcon.setVisibility(View.VISIBLE);
 			}
 
 			holder.mDelIcon.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					deleteLabelDialog(v.getContentDescription().toString());
+					deleteLabelDialog(labelName);
 				}
 			});
 			return convertView;
@@ -383,9 +410,8 @@ public class LabelsActivity extends Activity {
 	}
 
 	static class ViewHolder {
-		ImageView mDelIcon;
-		TextView mLabelName;
-		TextView mLabelColor;
-		boolean isDefaultLabel;
+		private ImageView mDelIcon;
+		private TextView mLabelName;
+		private TextView mLabelColor;
 	}
 }

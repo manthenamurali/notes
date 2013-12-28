@@ -12,7 +12,6 @@ import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.text.format.Formatter;
-import android.util.Log;
 
 public class Utils {
 
@@ -21,7 +20,6 @@ public class Utils {
 	private static Utils mUtils;
 	private static Context mContext;
 
-	private Typeface mRobotoSlabFont;
 	private Typeface mNoteFont; 
 
 	private float mNoteFontSize; 
@@ -31,6 +29,7 @@ public class Utils {
 	private static DateFormat mDateFormat;
 	private static Date mDate;
 
+	//singleton
 	private Utils() { }
 
 	public static Utils getInstance() {
@@ -42,9 +41,13 @@ public class Utils {
 		return mUtils;
 	}
 
+	/**
+	 * Initialise all the application related settings
+	 * 
+	 * @param context
+	 */
 	public void init(final Context context) {
 		mContext = context;
-		//mRobotoSlabFont = Typeface.createFromAsset(mContext.getAssets(), "fonts/RobotoSlab-Regular.ttf");
 
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		mDateTypeToDisplay = Integer.parseInt(mPrefs.getString(SettingsActivity.PREF_DATE_TO_DISPLAY, ""+SettingsActivity.DATE_TYPE_MODIFIED));
@@ -55,16 +58,20 @@ public class Utils {
 		
 		loadNoteFont(noteFont);
 		loadNoteFontSize(noteFontSize);
-		loadTheme();
+		getNoteTheme();
 	}
 
+	/**
+	 * load all the default themes to the shared preferences. 
+	 */
 	public void setDefaultThemesToSharedPref() {
 		final SharedPreferences sharedPref = mContext.getSharedPreferences(SettingsActivity.THEMES_SHARED_PREF, Context.MODE_PRIVATE);
 		final Map<String, ?> savedThemes = sharedPref.getAll(); 
-		if(savedThemes != null && savedThemes.size()  == 0) {
+		if(savedThemes != null) {
 			final Resources res = mContext.getResources();
 			final int themesInSharedPref = savedThemes.size();  
 			final int themesInRes = res.getInteger(R.integer.total_Default_themes);
+			// this check is for update scenario in future if new themes are added. if same don't save all just add only the existing 
 			if(themesInSharedPref != themesInRes) {
 				final Editor edit = sharedPref.edit();
 				
@@ -88,7 +95,11 @@ public class Utils {
 		}
 	}
 	
-	public String loadTheme() {
+	/**
+	 * load the current user selected theme
+	 * @return
+	 */
+	public String getNoteTheme() {
 		final int selectedTheme = Integer.parseInt(mPrefs.getString(SettingsActivity.PREF_THEME, ""+SettingsActivity.THEME_PLAIN));
 		final SharedPreferences sharedPref = mContext.getSharedPreferences(SettingsActivity.THEMES_SHARED_PREF, Context.MODE_PRIVATE);
 		String themeValue = null;
@@ -104,6 +115,7 @@ public class Utils {
 			break;
 		}  
 		
+		//if failed to add in shared preference load the default one
 		if(themeValue == null) {
 			final Resources res = mContext.getResources();
 			themeValue = String.valueOf(res.getColor(R.color.plain_theme_text_color)) + DELIMITER +
@@ -123,9 +135,12 @@ public class Utils {
 		return mDateFormat.format(mDate);
 	}
 
-	public Typeface getRobotoSlabFontTypeface() {
+	/**
+	 * this font is mostly used for app ui items.
+	 * @return
+	 */
+	public Typeface getFontTypefaceForTitles() {
 		return Typeface.SERIF;
-		//return mRobotoSlabFont;
 	}
 
 	public static int getDateTypeToDisplay() {
@@ -155,12 +170,16 @@ public class Utils {
 		case SettingsActivity.TEXT_FONT_SERIF:
 			mNoteFont = Typeface.SERIF;
 			break;
-		case SettingsActivity.TEXT_FONT_ROBOTO_SLAB:
-			mNoteFont = mRobotoSlabFont;
+		default:
+			mNoteFont = Typeface.SANS_SERIF;
 			break;
 		}
 	}
 	
+	/**
+	 * get the current note font selected by the user. 
+	 * @return
+	 */
 	public Typeface getNoteFont() {
 		return mNoteFont;
 	}
@@ -177,9 +196,16 @@ public class Utils {
 		case SettingsActivity.TEXT_SIZE_LARGE:
 			mNoteFontSize = res.getDimension(R.dimen.edit_text_size_large);
 			break;
+		default:
+			mNoteFontSize = res.getDimension(R.dimen.edit_text_size_normal);
+			break;
 		}
 	}
 	
+	/**
+	 * get the current note font size selected by the user. 
+	 * @return
+	 */
 	public float getNoteFontSize() {
 		return mNoteFontSize;
 	}
