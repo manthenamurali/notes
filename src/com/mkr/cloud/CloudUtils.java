@@ -1,16 +1,16 @@
 package com.mkr.cloud;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Map;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.Shader.TileMode;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.util.Log;
+import android.widget.Toast;
 
 import com.mkr.notes.Note;
 import com.mkr.notes.NotesActivity;
@@ -44,7 +44,7 @@ public class CloudUtils {
 	}
 	
 	public void loginIntoDropBox(final NotesActivity activity) {
-		if(mDropbox.isAlreadyLogged()) {
+		if(Dropbox.isAlreadyLogged()) {
 			//Toast.makeText(mContext, mContext.getResources().getString(R.string.already_logged_in), Toast.LENGTH_LONG).show();
 			displayAlertDialog(mContext.getResources().getString(R.string.dropbox_title));
 		} else {
@@ -58,7 +58,7 @@ public class CloudUtils {
 	}
 	
 	public String[] getAllInstalledCloudOptions() {
-		if(mDropbox.isAlreadyLogged()) {
+		if(Dropbox.isAlreadyLogged()) {
 			return new String[]{mContext.getResources().getString(R.string.dropbox_title)};
 		} else {
 			return null;
@@ -86,7 +86,7 @@ public class CloudUtils {
 		mIsDropboxLoginStarted = state;
 	}
 
-	public static void uploadFiles(final File[] files, final int storageOption) {
+	public void uploadFiles(final File[] files, final int storageOption) {
 		UploadFilesToStorage uploadTask = new UploadFilesToStorage(storageOption, files);
 		uploadTask.execute();
 	}
@@ -114,7 +114,7 @@ public class CloudUtils {
 		builder.create().show();
 	}
 	
-	static class UploadFilesToStorage extends AsyncTask<Void, Void, Void> {
+	class UploadFilesToStorage extends AsyncTask<Void, Void, Void> {
 		
 		private final int storageType;
 		private final File[] filesToUpload;
@@ -127,6 +127,8 @@ public class CloudUtils {
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
+			
+			Toast.makeText(mContext, mContext.getResources().getString(R.string.cloud_upload_started), Toast.LENGTH_SHORT).show();
 		}
 		
 		@Override
@@ -146,7 +148,6 @@ public class CloudUtils {
 					}
 					mDropbox.uploadFile(filesToUpload[i], title);
 				}
-				
 				break;
 			default:
 				break;
@@ -158,8 +159,18 @@ public class CloudUtils {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			
+			Toast.makeText(mContext, mContext.getResources().getString(R.string.cloud_upload_finish_dropbox), Toast.LENGTH_SHORT).show();
 		}
-		
 	}
 	
+	public boolean isNetworkConnected() {
+		ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo ni = cm.getActiveNetworkInfo();
+		if (ni == null) {
+			// There are no active networks.
+			return false;
+		} else
+			return true;
+	}
+
 }

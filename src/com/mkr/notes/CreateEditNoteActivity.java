@@ -53,7 +53,7 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 
 	private ProgressBar mProgressBar;
 
-	private ArrayList<String> mValuesList;
+	private ArrayList<String> mLabelsList;
 
 	private int mItemPosition;
 
@@ -97,14 +97,14 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 
 		final Map<String, ?> labels = LabelUtils.getAllSavedLables();
 		final Iterator<String> keysIterator = labels.keySet().iterator();
-		mValuesList = new ArrayList<String>();
+		mLabelsList = new ArrayList<String>();
 		while (keysIterator.hasNext()) {
-			mValuesList.add(keysIterator.next()); 
+			mLabelsList.add(keysIterator.next()); 
 		}
 		
-		mItemPosition = mValuesList.indexOf(noteLabel);
+		mItemPosition = mLabelsList.indexOf(noteLabel);
 		
-		final String[] values = mValuesList.toArray(new String[mValuesList.size()]);;
+		final String[] values = mLabelsList.toArray(new String[mLabelsList.size()]);;
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActionBar().getThemedContext(),
 				android.R.layout.simple_spinner_item, android.R.id.text1,
 				values);
@@ -359,7 +359,8 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 		mNoteModifiedtime = System.currentTimeMillis();
 		final String title = getNoteTitle();
 		NotesDBHelper dbHelper = NotesDBHelper.getInstance(CreateEditNoteActivity.this);
-		dbHelper.insertNewNote(mNoteCreationtime, mNoteModifiedtime, title, mNotePath, mValuesList.get(mItemPosition), mShouldInsertCustomTitle);
+		
+		dbHelper.insertNewNote(mNoteCreationtime, mNoteModifiedtime, title, mNotePath, mLabelsList.get(mItemPosition), mShouldInsertCustomTitle);
 	}
 
 	public String getNoteTitle() {
@@ -438,6 +439,7 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		mItemPosition = itemPosition;
-		return false;
+		Log.e("kpt","item position-->"+mLabelsList.get(mItemPosition));
+		return true;
 	}
 }

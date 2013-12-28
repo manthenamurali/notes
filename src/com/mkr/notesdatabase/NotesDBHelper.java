@@ -50,7 +50,6 @@ public class NotesDBHelper {
 			final String notePath, final String label, final int isTitleSelected) {
 
 		final ContentValues values = new ContentValues();
-		values.put(SQLiteHelper.COLUMN_CREATED_TIME, createTime);
 		values.put(SQLiteHelper.COLUMN_MODIFIED_TIME, modifiedTime);
 		values.put(SQLiteHelper.COLUMN_NOTE_TITLE, noteTitle);
 		values.put(SQLiteHelper.COLUMN_NOTE_PATH, notePath);
@@ -58,11 +57,20 @@ public class NotesDBHelper {
 		//1 = true, 0= false
 		values.put(SQLiteHelper.COLUMN_HAS_CUSTOM_TITLE, isTitleSelected);
 
+		long rowID = -1;
 		if(mSQLWritableDatabase.isOpen()) {
-			final long rowID = mSQLWritableDatabase.insert(SQLiteHelper.TABLE_NAME, null, values);
-			if(rowID == -1) {
-				Log.e("mkr","FAILED TO INSERT THE NOTE");
+			if(!isRowAlreadyExists(createTime)) {
+				values.put(SQLiteHelper.COLUMN_CREATED_TIME, createTime);
+				rowID = mSQLWritableDatabase.insert(SQLiteHelper.TABLE_NAME, null, values);
+			} else {
+				Log.e("mkr","row already exists. So just update the values");
+				rowID = mSQLWritableDatabase.update(SQLiteHelper.TABLE_NAME, values, SQLiteHelper.COLUMN_CREATED_TIME 
+						+ " = " + createTime, null);
 			}
+		}
+		
+		if(rowID == -1) {
+			Log.e("mkr","FAILED TO INSERT THE NOTE");
 		}
 	}
 
@@ -71,6 +79,10 @@ public class NotesDBHelper {
 								+ " = " + createdTime, null);
 		Log.e("mkr","Number of rows deleted = " + deletedRows);
 		getAllSavedNotes();
+	}
+	
+	private boolean isRowAlreadyExists(final long createdTime) {
+		return mNotesInfo.containsKey(createdTime);
 	}
 	
 	public ArrayList<Note> getAllSavedNotes() {

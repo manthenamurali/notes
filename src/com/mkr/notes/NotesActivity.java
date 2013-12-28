@@ -303,7 +303,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			startActivity(intent);
 			break;
 		case R.id.menu_help:
-			showDialog(0);
+			displayHelpDialog(0);
 			break;
 		case R.id.menu_feedback:
 			final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -346,36 +346,28 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			
+			final int selectedFilesLength = mSelectedItemsList.size();
+			final File[] files = new File[selectedFilesLength];
+			for (int i = 0; i < selectedFilesLength; i++) {
+				final String path = INTERNAL_STORAGE_PATH + "/" + mSelectedItemsList.get(i) + ".txt";
+				files[i] = new File(path);
+			}
+			
 			switch (item.getItemId()) {
 			case R.id.item_delete:
 				deleteNote();
 				break;
 			case R.id.item_save:
-				backupSelectedNotes();
+				backupSelectedNotes(files);
 				break;
 			case R.id.item_share:
 				shareNotes();
 				break;
 			case R.id.item_cloud:
-				final int selectedFilesLength = mSelectedItemsList.size();
-				final File[] files = new File[selectedFilesLength];
-				for (int i = 0; i < selectedFilesLength; i++) {
-					final String path = INTERNAL_STORAGE_PATH + "/" + mSelectedItemsList.get(i) + ".txt";
-					files[i] = new File(path);
-				}
-				
 				displaySelectCloudDialog(files);
 				break;
 			case R.id.item_info:
-				
-				final int len = mSelectedItemsList.size();
-				final File[] fileArr = new File[len];
-				for (int i = 0; i < len; i++) {
-					final String path = INTERNAL_STORAGE_PATH + "/" + mSelectedItemsList.get(i) + ".txt";
-					fileArr[i] = new File(path);
-				}
-				
-				displayNotesInfo(fileArr);
+				displayNotesInfo(files);
 				break;
 			default:
 				break;
@@ -447,12 +439,16 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				if(options == null) {
 					mDrawerLayout.openDrawer(Gravity.LEFT);
 				} else {
-					switch (which) {
-					case -1:
-						CloudUtils.uploadFiles(filesToUpload, R.string.dropbox_title);
-						break;
-					default:
-						break;
+					if(CloudUtils.getInstance().isNetworkConnected()) {
+						switch (which) {
+						case -1:
+							CloudUtils.getInstance().uploadFiles(filesToUpload, R.string.dropbox_title);
+							break;
+						default:
+							break;
+						}
+					} else {
+						Toast.makeText(NotesActivity.this, getString(R.string.no_network), Toast.LENGTH_LONG).show();
 					}
 				}
 			}
@@ -549,7 +545,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		}
 	}
 	
-	private void backupSelectedNotes() {
+	private void backupSelectedNotes(final File[] files) {
 		final String storageState = Environment.getExternalStorageState();
 		Log.e("kpt","Storage state--->"+storageState);
 		if(!storageState.equals(Environment.MEDIA_MOUNTED)) {
@@ -557,10 +553,10 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			return;
 		}
 		
-		new BackupFiles().execute();
+		new BackupFiles().execute(files);
 	}
 	
-	class BackupFiles extends AsyncTask<Void, Void, Void> {
+	class BackupFiles extends AsyncTask<File, Void, Void> {
 		private ProgressDialog pd;
 		
 		@Override
@@ -570,7 +566,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		}
 
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected Void doInBackground(File... params) {
 			
 			//check if any folder is already created
 			final String externalStoragePath = Environment.getExternalStorageDirectory().getPath();
@@ -580,14 +576,20 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				folder.mkdirs();
 			}
 			
-			final File f = new File(INTERNAL_STORAGE_PATH);
-			if(f != null) {
-				final File[] allfiles = f.listFiles();
-				for (int i = 0; i < allfiles.length; i++) {
-					final File file = allfiles[i];
-					saveNote(file.getPath(), folder.getPath()+"/"+file.getName());
+			final Map<Long, Note> notesMap = NotesDBHelper.getCurrentNotesMap();
+			for (final File file : params) {
+				Log.e("mkr","files path-->"+file.getPath());
+				
+				final String fileNameWithoutExt = Utils.getOnlyFileName(file.getName());
+				final Note note = notesMap.get(Long.valueOf(fileNameWithoutExt));
+				String title = file.getName(); 
+				if(note != null && note.title != null) {
+					title = note.title +".txt";
 				}
+				
+				saveNote(file.getPath(), folder.getPath()+"/"+title);
 			}
+			
 			return null;
 		}
 
@@ -704,18 +706,16 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		builder.setView(scrollView);
 
 		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			@SuppressWarnings("deprecation")
 			public void onClick(DialogInterface dialog, int which) {
 				 PreferenceManager.getDefaultSharedPreferences(NotesActivity.this).edit().putBoolean(SettingsActivity.PREF_FIRST_LAUNCH, false).commit();
-				 showDialog(0);
+				 displayHelpDialog(0);
 			}
 		});
 
 		builder.create().show();
 	}
 	
-	@Override
-	protected Dialog onCreateDialog(int id) {
+	private void displayHelpDialog(int id) {
 		mHelpTutorialPage = 1;
 
 		final AlertDialog.Builder builder = new AlertDialog.Builder(NotesActivity.this);
@@ -750,7 +750,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				mHelpTutorialPage = 1;
 			}
 		});
-		
+
 		mHeplpTutorialAlertDialog = builder.create();
 		mHeplpTutorialAlertDialog.show();
 
@@ -775,16 +775,8 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 					mHeplpTutorialAlertDialog.getButton(Dialog.BUTTON_POSITIVE).setClickable(true);
 					mHeplpTutorialAlertDialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(true);
 				}
-			}});
-		return mHeplpTutorialAlertDialog;
-	}
-	
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onPrepareDialog(int id, Dialog dialog) {
-		super.onPrepareDialog(id, dialog);
-		
-		
+			}
+		});
 	}
 	
 	@Override

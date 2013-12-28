@@ -35,6 +35,7 @@
             android:screenOrientation="portrait"/>
         
         <activity android:name="com.mkr.notes.CreateEditNoteActivity"
+            android:screenOrientation="portrait"
             android:configChanges="orientation"
             android:windowSoftInputMode="adjustResize" />
 
