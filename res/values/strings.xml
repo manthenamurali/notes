@@ -52,7 +52,7 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     
-    <string name="tap_icon_to_edit">Tap on the edit icon to edit the note</string>
+    <string name="tap_icon_to_edit">Double Tap the editor or Tap on the edit icon to edit the note</string>
      
     <string name="save_to_dialog">Save Note</string>
     <string name="save_to_dialog_msg">Enter some text in the subject filed to save the note</string>

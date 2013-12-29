@@ -85,9 +85,19 @@ public class Utils {
 						String.valueOf(res.getColor(R.color.green_theme_line_color)) + DELIMITER +
 						String.valueOf(res.getColor(R.color.green_theme_background_color));
 				
+				final String pinkTheme = String.valueOf(res.getColor(R.color.light_pink_theme_text_color)) + DELIMITER +
+						String.valueOf(res.getColor(R.color.light_pink_theme_line_color)) + DELIMITER +
+						String.valueOf(res.getColor(R.color.light_pink_theme_background_color));
+				
+				final String orangeTheme = String.valueOf(res.getColor(R.color.orange_theme_text_color)) + DELIMITER +
+						String.valueOf(res.getColor(R.color.orange_theme_line_color)) + DELIMITER +
+						String.valueOf(res.getColor(R.color.orange_theme_background_color));
+				
 				edit.putString(SettingsActivity.PREF_THEME_PLAIN, plainTheme);
 				edit.putString(SettingsActivity.PREF_THEME_YELLOW, yellowTheme);
 				edit.putString(SettingsActivity.PREF_THEME_GREEN, greenTheme);
+				edit.putString(SettingsActivity.PREF_THEME_PINK, pinkTheme);
+				edit.putString(SettingsActivity.PREF_THEME_ORANGE, orangeTheme);
 				edit.commit();
 			}
 		}
@@ -110,6 +120,12 @@ public class Utils {
 			break;
 		case SettingsActivity.THEME_GREEN:
 			themeValue = sharedPref.getString(SettingsActivity.PREF_THEME_GREEN, null);
+			break;
+		case SettingsActivity.THEME_PINK:
+			themeValue = sharedPref.getString(SettingsActivity.PREF_THEME_PINK, null);
+			break;
+		case SettingsActivity.THEME_ORANGE:
+			themeValue = sharedPref.getString(SettingsActivity.PREF_THEME_ORANGE, null);
 			break;
 		}  
 		

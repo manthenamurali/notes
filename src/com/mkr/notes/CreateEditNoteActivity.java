@@ -18,10 +18,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextUtils;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -126,8 +128,22 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 			mSubjectEditText.setFocusable(true);
 			mSubjectEditText.requestFocus();
 		}
+		
+		mSubjectEditText.setOnTouchListener(new View.OnTouchListener() {
+		    public boolean onTouch(View v, MotionEvent event) {
+		        return gestureDetector.onTouchEvent(event);
+		    }
+		});
 	}
 
+	@SuppressWarnings("deprecation")
+	final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
+	    public boolean onDoubleTap(MotionEvent e) {
+	    	editNote();
+	        return true;
+	    }
+	});
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -182,22 +198,7 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 			startActivity(i);
 			break;
 		case R.id.menu_edit_note:
-			
-			mTitleEditText.setFocusable(true);
-			mTitleEditText.setFocusableInTouchMode(true);
-			
-			mSubjectEditText.setFocusable(true);
-			mSubjectEditText.setFocusableInTouchMode(true);
-			mSubjectEditText.requestFocus();
-			
-			final MenuItem editMenu = mMenu.findItem(R.id.menu_edit_note); 
-			final MenuItem titleMenu = mMenu.findItem(R.id.menu_title);
-
-			editMenu.setVisible(false);
-			editMenu.setEnabled(false);
-			
-			titleMenu.setEnabled(true);
-
+			editNote();
 			break;
 		case R.id.menu_title:
 			if(mTitleEditText.getVisibility() != View.VISIBLE) {
@@ -221,6 +222,31 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 		return true;
 	}
 
+	private void editNote() {
+		if(mMenu == null) {
+			return;
+		}
+		
+		final MenuItem editMenu = mMenu.findItem(R.id.menu_edit_note); 
+		if(!editMenu.isVisible()) {
+			return;
+		}
+		
+		mTitleEditText.setFocusable(true);
+		mTitleEditText.setFocusableInTouchMode(true);
+		
+		mSubjectEditText.setFocusable(true);
+		mSubjectEditText.setFocusableInTouchMode(true);
+		mSubjectEditText.requestFocus();
+		
+		final MenuItem titleMenu = mMenu.findItem(R.id.menu_title);
+
+		editMenu.setVisible(false);
+		editMenu.setEnabled(false);
+		
+		titleMenu.setEnabled(true);
+	}
+	
 	private void discard() {
 		//if this is create option then delete the file also, if edit don't delete since some data will
 		//already present 
@@ -363,10 +389,20 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 
 				saveToDatabase();
 
-				final Intent serviceIntent = new Intent(CreateEditNoteActivity.this, SaveNoteService.class);
-				serviceIntent.putExtra("text", text);
-				serviceIntent.putExtra("filepath", mNotePath);
-				startService(serviceIntent);
+				boolean shouldSave = true;
+				if(mMenu != null) {
+					final MenuItem editMenu = mMenu.findItem(R.id.menu_edit_note);
+					if(editMenu != null && editMenu.isVisible()) {
+						shouldSave = false;
+					}
+				}
+				
+				if(shouldSave) {
+					final Intent serviceIntent = new Intent(CreateEditNoteActivity.this, SaveNoteService.class);
+					serviceIntent.putExtra("text", text);
+					serviceIntent.putExtra("filepath", mNotePath);
+					startService(serviceIntent);
+				}
 			} else {
 				final File fileToDelete = new File(mNotePath);
 				if(fileToDelete != null && fileToDelete.exists()) {

@@ -710,7 +710,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		Intent i = new Intent();
 		i.setAction(Intent.ACTION_SEND);
 		i.setType("text/plain");
-		i.putExtra(Intent.EXTRA_SUBJECT, file.getName());
 		i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
 		i = Intent.createChooser(i, "Send to ..");
 

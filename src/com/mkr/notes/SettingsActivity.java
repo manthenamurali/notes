@@ -19,10 +19,14 @@ public class SettingsActivity extends PreferenceActivity{
 	public static final String PREF_THEME_PLAIN      	=  "theme_plain";
 	public static final String PREF_THEME_YELLOW	    =  "theme_yellow";
 	public static final String PREF_THEME_GREEN		    =  "theme_green";
+	public static final String PREF_THEME_PINK	    	=  "theme_pink";
+	public static final String PREF_THEME_ORANGE		=  "theme_orange";
 	
 	public static final int THEME_PLAIN      			=  0;
 	public static final int THEME_YELLOW	        	=  1;
 	public static final int THEME_GREEN	        		=  2;
+	public static final int THEME_PINK	        		=  3;
+	public static final int THEME_ORANGE	        	=  4;
 	
 	public static final String PREF_TEXT_SIZE 			= "text_size";
 	public static final String PREF_TEXT_FONT 			= "text_font";

@@ -2,7 +2,7 @@
 <resources>
 
     		<!-- dont forget to update this variable -->
-    <integer name="total_Default_themes">3</integer>
+    <integer name="total_Default_themes">5</integer>
 
    			 <!-- plain theme -->
     <color name="plain_theme_text_color">#000000</color>
@@ -18,5 +18,16 @@
     <color name="green_theme_text_color">#307445</color>
     <color name="green_theme_line_color">#337647</color>
     <color name="green_theme_background_color">#d2e9cd</color>
+    
+    		<!-- light pink theme -->
+    <color name="light_pink_theme_text_color">#000000</color>
+    <color name="light_pink_theme_line_color">#ffb366</color>
+    <color name="light_pink_theme_background_color">#ffebd7</color>
+    
+   			<!-- orange theme -->
+    <color name="orange_theme_text_color">#000000</color>
+    <color name="orange_theme_line_color">#ff6e6e</color>
+    <color name="orange_theme_background_color">#ffe8e8</color>
+    
 
 </resources>
