@@ -52,8 +52,12 @@ public class CloudUtils {
 		if(Dropbox.isAlreadyLogged()) {
 			displayAlertDialog(mContext.getResources().getString(R.string.dropbox_title));
 		} else {
-			setDropboxLoginState(true);
-			mDropbox.Login();
+			if(isNetworkConnected()) {
+				setDropboxLoginState(true);
+				mDropbox.Login();
+			} else {
+				Toast.makeText(mContext, mContext.getResources().getString(R.string.no_network), Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 	

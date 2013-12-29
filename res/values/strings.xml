@@ -11,9 +11,10 @@
     <string name="help">Help</string>
     <string name="feedback">Feedback</string>
     <string name="quit">Quit</string>
+    <string name="saved">Saved</string>
     
     <string name="confirm_delete_title">Confirm Delete</string>
-    <string name="confirm_delete_msg">Are you sure you want to delete the notes?</string>
+    <string name="confirm_delete_msg">Are you sure you want to delete?</string>
     
     <string name="version">Version : 0.1 </string>
  	<string name="author">Developer : Manthena Murali \n manthena.android@gmail.com</string>
@@ -32,6 +33,7 @@
     <string name="select_theme">Select Theme</string>
     
  	<string name="no_network">Please check your internet connection and try again</string>
+ 	<string name="saved_to_sdcard">File(s) are saved to your SDCard at </string>
  	
  	<string name="cloud_upload_started">Uploading file(s)...</string>
  	<string name="cloud_upload_finish_dropbox">Files Successfully uploaded to your dropbox account</string>
@@ -42,12 +44,10 @@
     <string name="pref_font_summary">Set the font for the text in the editor</string>
     <string name="pref_text_size_title">Text Size</string>
     <string name="pref_text_size_summary">Set the size for the text in the editor</string>
-    <string name="pref_time_toDisplay_title">Date to display</string>
-    <string name="pref_time_toDisplay_summary">Select if creation date or modified date to display</string>
-    <string name="pref_sort_notes_title">Sort order</string>
-    <string name="pref_sort_notes_summary">Choose how notes are displayed in the list</string>
     <string name="pref_theme_title">Themes</string>
     <string name="pref_theme_summary">Select a theme for editor</string>
+    <string name="pref_open_title">Note open action</string>
+    <string name="pref_open_summary">Select a type how the note should be opened by default </string>
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>

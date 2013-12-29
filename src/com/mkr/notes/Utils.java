@@ -24,7 +24,6 @@ public class Utils {
 
 	private float mNoteFontSize; 
 	
-	private static int mDateTypeToDisplay;
 	private SharedPreferences mPrefs;
 	private static DateFormat mDateFormat;
 	private static Date mDate;
@@ -50,7 +49,6 @@ public class Utils {
 		mContext = context;
 
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		mDateTypeToDisplay = Integer.parseInt(mPrefs.getString(SettingsActivity.PREF_DATE_TO_DISPLAY, ""+SettingsActivity.DATE_TYPE_MODIFIED));
 		setDefaultThemesToSharedPref();
 
 		final int noteFont = Integer.parseInt(mPrefs.getString(SettingsActivity.PREF_TEXT_FONT, ""+SettingsActivity.TEXT_FONT_SANS));
@@ -143,10 +141,6 @@ public class Utils {
 		return Typeface.SERIF;
 	}
 
-	public static int getDateTypeToDisplay() {
-		return mDateTypeToDisplay;
-	}
-	
 	public void updateFont(final int font) {
 		mPrefs.edit().putString(SettingsActivity.PREF_TEXT_FONT, ""+font).commit();
 	}

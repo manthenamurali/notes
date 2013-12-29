@@ -24,8 +24,6 @@ public class SettingsActivity extends PreferenceActivity{
 	public static final int THEME_YELLOW	        	=  1;
 	public static final int THEME_GREEN	        		=  2;
 	
-	public static final String PREF_DATE_TO_DISPLAY 	= "notes_time_type";
-	public static final String PREF_LIST_SORT_TYPE 		= "notes_sort_type";
 	public static final String PREF_TEXT_SIZE 			= "text_size";
 	public static final String PREF_TEXT_FONT 			= "text_font";
 	public static final String PREF_THEME	 			= "theme";
@@ -43,6 +41,8 @@ public class SettingsActivity extends PreferenceActivity{
 	public static final int DATE_TYPE_CREATED 		= 1;
 	
 	public static final String PREF_FIRST_LAUNCH   	= "first_launch";
+	
+	//public static final String PREF_NOTE_OPEN_OPTIONS   	= "notes_open_type";
 
 	@SuppressWarnings("deprecation")
 	@Override

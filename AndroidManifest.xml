@@ -28,6 +28,7 @@
         </activity>
         
         <activity android:name="com.mkr.notes.SettingsActivity"
+            android:label="@string/app_label_settings"
             android:noHistory="true" />
         
         <activity android:name="com.mkr.notes.labels.LabelsActivity"

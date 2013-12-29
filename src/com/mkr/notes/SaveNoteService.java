@@ -7,6 +7,7 @@ import java.io.IOException;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.widget.Toast;
 
 /**
  * this is the service which saves the note in the internal storage
@@ -29,6 +30,9 @@ public class SaveNoteService extends Service {
 			mNotesText = intent.getStringExtra("text");
 			mNotePath = intent.getStringExtra("filepath");
 			saveNote(mNotesText);
+			
+			Toast.makeText(SaveNoteService.this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
+			
 			stopSelf();
 		}
 		return 0;

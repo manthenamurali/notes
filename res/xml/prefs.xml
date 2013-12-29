@@ -28,24 +28,16 @@
         </ListPreference>
     </PreferenceCategory>
     
-    <!-- <PreferenceCategory android:title="Notes display settings" >
+    <!-- <PreferenceCategory android:title="Notes settings" >
         <ListPreference
             android:defaultValue="0"
-            android:entries="@array/sort_notes_entries"
-            android:entryValues="@array/sort_notes_values"
-            android:key="notes_sort_type"
-            android:summary="@string/pref_sort_notes_summary"
-            android:title="@string/pref_sort_notes_title" >
+            android:entries="@array/note_open_entries"
+            android:entryValues="@array/note_open_values"
+            android:key="notes_open_type"
+            android:summary="@string/pref_open_summary"
+            android:title="@string/pref_open_title" >
         </ListPreference>
-       <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/date_type_entries"
-            android:entryValues="@array/date_type_values"
-            android:key="notes_time_type"
-            android:summary="@string/pref_time_toDisplay_summary"
-            android:title="@string/pref_time_toDisplay_title" >
-        </ListPreference>
-    </PreferenceCategory> -->
+    </PreferenceCategory>  -->
     
     <PreferenceCategory android:title="About" >
         <Preference

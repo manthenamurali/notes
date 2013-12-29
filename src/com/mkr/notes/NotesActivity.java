@@ -70,6 +70,8 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	public static final int NOTE_CREATE = 0;
 	public static final int NOTE_EDIT = 1;
 
+	public static final int MSG_DELETE_NOTES 			 = 0;
+	
 	public static final String INTENT_KEY_NOTE_TYPE      =  "note_type";
 	public static final String INTENT_KEY_NOTE_TITLE     =  "note_title";
 	public static final String INTENT_KEY_CREATE_TIME    =  "creation_time";
@@ -96,6 +98,31 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	
 	private AlertDialog mHeplpTutorialAlertDialog;
 	private int mHelpTutorialPage;
+	
+	Handler handler = new Handler() {
+		public void handleMessage(Message msg) {
+			int which = msg.what;
+			switch (which) {
+			case MSG_DELETE_NOTES:
+				final File[] files = (File[]) msg.obj;
+				
+				for (File file : files) {
+					String creationTime = Utils.getOnlyFileName(file.getName());
+					mDBHelper.deleteNote(Long.valueOf(creationTime));
+					
+					//also delete the file from internal storage
+					if(file.exists()) {
+						file.delete();
+					}
+				}
+				
+				DisplaySavedLists displaySavedListsTask = new DisplaySavedLists(); ;
+				displaySavedListsTask.execute();
+				
+				break;
+			}
+		};
+	};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -355,7 +382,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			
 			switch (item.getItemId()) {
 			case R.id.item_delete:
-				deleteNote();
+				deleteNote(files);
 				break;
 			case R.id.item_save:
 				backupSelectedNotes(files);
@@ -531,17 +558,24 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		});
 	}
 	
-	private void deleteNote() {
-		File fileToDelete;
-		for (long val : mSelectedItemsList) {
-			mDBHelper.deleteNote(val);
-			
-			//also delete the file from internal storage
-			fileToDelete = new File(INTERNAL_STORAGE_PATH + "/" + val + ".txt");
-			if(fileToDelete.exists()) {
-				 fileToDelete.delete();
+	private void deleteNote(final File[] files) {
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(NotesActivity.this);
+		builder.setTitle(R.string.confirm_delete_title);
+		builder.setMessage(R.string.confirm_delete_msg);
+		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Message msg = Message.obtain(handler, MSG_DELETE_NOTES, files);
+				handler.sendMessage(msg);
 			}
-		}
+		});
+		
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) { }
+		});
+		builder.create().show();
 	}
 	
 	/**
@@ -600,6 +634,9 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			pd.dismiss();
+			
+			final String path = Environment.getExternalStorageDirectory().getPath() +"/"+ getString(R.string.app_name);
+			Toast.makeText(NotesActivity.this, getString(R.string.saved_to_sdcard) + " " + path, Toast.LENGTH_LONG).show();
 		}
 		
 		public void saveNote(final String sourceLocation, final String targetLocation) {

@@ -80,13 +80,7 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 		holder.mTitle.setText(data.title);
 		holder.mLabelColor.setBackgroundColor(LabelUtils.getLabelColor(data.NoteLabel));
 		
-		String date;
-		if(Utils.getDateTypeToDisplay() == SettingsActivity.DATE_TYPE_MODIFIED) {
-			date = Utils.getReadableTime(data.modifiedDate);
-		} else {
-			date = Utils.getReadableTime(data.modifiedDate);
-		}
-		
+		final String date = Utils.getReadableTime(data.modifiedDate);
 		holder.mMonth.setText(date.substring(4, 7));
 		holder.mDate.setText(date.substring(8, 10));
 		holder.mDay.setText(date.substring(0, 3));

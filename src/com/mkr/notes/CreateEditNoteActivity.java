@@ -11,7 +11,6 @@ import java.util.Map;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -25,7 +24,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
@@ -149,19 +147,32 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 		mMenu = menu;
 		
 		final MenuItem editMenu = menu.findItem(R.id.menu_edit_note); 
-		final MenuItem titleMenu = menu.findItem(R.id.menu_title);
-		
 		if(mNoteActionType == NotesActivity.NOTE_EDIT) {
 			editMenu.setVisible(true);
-			titleMenu.setEnabled(false);
 		} else {
 			editMenu.setVisible(false);
-			titleMenu.setEnabled(true);
 		}
 		
 		return true;
 	}
 
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		final MenuItem titleMenu = menu.findItem(R.id.menu_title);
+		final MenuItem editMenu = menu.findItem(R.id.menu_edit_note);
+		
+		if(editMenu.isVisible()) {
+			titleMenu.setEnabled(false);
+		} else {
+			if(mTitleEditText.getVisibility() == View.VISIBLE) {
+				titleMenu.setEnabled(false);
+			} else {
+				titleMenu.setEnabled(true);
+			}
+		}
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -178,9 +189,6 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 			mSubjectEditText.setFocusable(true);
 			mSubjectEditText.setFocusableInTouchMode(true);
 			mSubjectEditText.requestFocus();
-			
-			final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 			
 			final MenuItem editMenu = mMenu.findItem(R.id.menu_edit_note); 
 			final MenuItem titleMenu = mMenu.findItem(R.id.menu_title);
@@ -207,12 +215,26 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 			displayThemes();
 			break;
 		case R.id.menu_discard:
-			finish();
+			discard();
 			break;
 		}
 		return true;
 	}
 
+	private void discard() {
+		//if this is create option then delete the file also, if edit don't delete since some data will
+		//already present 
+		if(mNoteActionType == NotesActivity.NOTE_CREATE) {
+			final String path = NotesActivity.INTERNAL_STORAGE_PATH + "/" + mNoteCreationtime + ".txt";
+			final File file = new File(path);
+			if(file != null && file.exists()) {
+				file.delete();
+			}
+		}
+		
+		finish();
+	}
+	
 	private void displayFonts() {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(CreateEditNoteActivity.this);
 		builder.setTitle(R.string.select_font);
@@ -386,6 +408,10 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 			} else {
 				title = text.substring(0, MAX_TITLE_LEN);
 			}
+		}
+		
+		if(title != null) {
+			title = title.trim();
 		}
 		return title;
 	}
