@@ -257,8 +257,9 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 				file.delete();
 			}
 		}
-		
 		finish();
+		
+		Toast.makeText(CreateEditNoteActivity.this, getString(R.string.note_discarded), Toast.LENGTH_LONG).show();
 	}
 	
 	private void displayFonts() {

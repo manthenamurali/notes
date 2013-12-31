@@ -33,8 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             ads:adSize="BANNER"
-            android:visibility="gone"
-            ads:adUnitId="a1510344868e963"
+            ads:adUnitId="a152c02b68dc295"
             ads:loadAdOnCreate="true" >
         </com.google.ads.AdView>
         

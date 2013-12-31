@@ -338,7 +338,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			emailIntent.setType("plain/text");
 			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "manthena.android@gmail.com" });
 			emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Notepad : New feature/Suggestion");
-			startActivity(Intent.createChooser(emailIntent,"Send mail"));
+			startActivity(Intent.createChooser(emailIntent,"Send your feedback"));
 			break;
 		}
 		return true;

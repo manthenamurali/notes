@@ -113,6 +113,8 @@ public class Dropbox {
 				TokenPair tokens = session.getAccessTokenPair();
 				storeKeys(tokens.key, tokens.secret);
 				setLoggedIn(true);
+				
+				Toast.makeText(mContext, mContext.getResources().getString(R.string.add_account_succesful), Toast.LENGTH_SHORT).show();
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}
@@ -131,7 +133,7 @@ public class Dropbox {
 		mDBApi.getSession().unlink();
 		clearKeys();
 		setLoggedIn(false);
-		Toast.makeText(mContext, mContext.getResources().getString(R.string.remove_account_succesful), Toast.LENGTH_LONG).show();
+		Toast.makeText(mContext, mContext.getResources().getString(R.string.remove_account_succesful), Toast.LENGTH_SHORT).show();
 	}
 
 	private void storeKeys(String key, String secret) {

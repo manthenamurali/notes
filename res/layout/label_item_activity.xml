@@ -20,7 +20,8 @@
         <TextView
             android:id="@+id/lable_name_activity"
             android:layout_width="0dip"
-            android:layout_height="50dip"
+            android:minHeight="50dip"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_weight="0.8"
             android:gravity="center_vertical"

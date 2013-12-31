@@ -12,6 +12,7 @@
     <string name="feedback">Feedback</string>
     <string name="quit">Quit</string>
     <string name="saved">Saved</string>
+    <string name="note_discarded">Note Discarded</string>
     
     <string name="confirm_delete_title">Confirm Delete</string>
     <string name="confirm_delete_msg">Are you sure you want to delete?</string>
@@ -66,6 +67,7 @@
     <string name="already_logged">Already Logged-in</string>
     <string name="logout">Logout</string>
     <string name="remove_added_dropbox_account">Do you want to log-out from your Dropbox account?</string>
+    <string name="add_account_succesful">Account added succesfully</string>
     <string name="remove_account_succesful">Account succesfully removed</string>
     
     <string name="labels_manager">Label Manager</string>
@@ -85,6 +87,6 @@
     
     <string name="welcome_msg">Welcome to Easy Notes</string>
  	<string name="change_log"><b>Change Log :</b>
- 	    \n\n <b>v0.1</b> \n\t ● First Release 
+ 	    \n\n <b>v0.1</b> \n\t ● First Release \n\t ● Save to DropBox \n\t ● Labels Manager
  	    \n</string>
 </resources>
