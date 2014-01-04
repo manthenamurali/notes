@@ -38,7 +38,7 @@ public class Dropbox {
 	private static final String ACCESS_KEY_NAME = "ACCESS_KEY";
 	private static final String ACCESS_SECRET_NAME = "ACCESS_SECRET";
 
-	private static final String DROPBOX_FOLDER_NAME = "EasyNotes";
+	private static final String DROPBOX_FOLDER_NAME = "SyncNotes";
 	
 	private Dropbox() { }
 
@@ -115,6 +115,8 @@ public class Dropbox {
 				setLoggedIn(true);
 				
 				Toast.makeText(mContext, mContext.getResources().getString(R.string.add_account_succesful), Toast.LENGTH_SHORT).show();
+				CloudUtils.setDropboxLoginState(false);
+				
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}

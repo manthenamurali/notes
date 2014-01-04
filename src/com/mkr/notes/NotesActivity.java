@@ -65,7 +65,7 @@ import com.mkr.notesdatabase.NotesDBHelper;
 
 public class NotesActivity extends Activity implements OnSharedPreferenceChangeListener {
 
-	public static final String TAG = "Easy Notes";
+	public static final String TAG = "Sync Notes";
 	
 	public static final int NOTE_CREATE = 0;
 	public static final int NOTE_EDIT = 1;

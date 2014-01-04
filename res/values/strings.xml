@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Easy Notes</string>
-     <string name="app_label_settings">Easy Notes Settings</string>
+    <string name="app_name">Sync Notes</string>
+     <string name="app_label_settings">Sync Notes Settings</string>
      
     <string name="add_new">Create New Note</string>
     <string name="discard">Discard</string>
@@ -85,7 +85,7 @@
     
     <string name="info">Info</string>
     
-    <string name="welcome_msg">Welcome to Easy Notes</string>
+    <string name="welcome_msg">Welcome to Sync Notes</string>
  	<string name="change_log"><b>Change Log :</b>
  	    \n\n <b>v0.1</b> \n\t ● First Release \n\t ● Save to DropBox \n\t ● Labels Manager
  	    \n</string>
