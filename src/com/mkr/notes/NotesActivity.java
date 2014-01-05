@@ -11,11 +11,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,19 +36,25 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.view.ActionMode;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -63,13 +71,17 @@ import com.mkr.notes.labels.LabelUtils;
 import com.mkr.notes.labels.LabelsActivity;
 import com.mkr.notesdatabase.NotesDBHelper;
 
-public class NotesActivity extends Activity implements OnSharedPreferenceChangeListener {
+public class NotesActivity extends Activity implements OnSharedPreferenceChangeListener, TextWatcher {
 
 	public static final String TAG = "Sync Notes";
 	
 	public static final int NOTE_CREATE = 0;
 	public static final int NOTE_EDIT = 1;
-
+	
+	public static final int DISPLAY_FILTER_ALL 		= 0;
+	public static final int DISPLAY_FILTER_SEARCH 	= 1;
+	public static final int DISPLAY_FILTER_LABLES 	= 2;
+	
 	public static final int MSG_DELETE_NOTES 			 = 0;
 	
 	public static final String INTENT_KEY_NOTE_TYPE      =  "note_type";
@@ -99,6 +111,10 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	private AlertDialog mHeplpTutorialAlertDialog;
 	private int mHelpTutorialPage;
 	
+	private ActionBar mActionBar;
+	private MenuItem mSearchMenuItem; 
+	private int mCurrentNotesDisplayType = DISPLAY_FILTER_ALL;
+	
 	Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			int which = msg.what;
@@ -116,9 +132,13 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 					}
 				}
 				
-				DisplaySavedLists displaySavedListsTask = new DisplaySavedLists(); ;
-				displaySavedListsTask.execute();
-				
+				if(mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) {
+					removeCustomSearchView();
+				} else {
+					DisplaySavedLists displaySavedListsTask = new DisplaySavedLists();
+					displaySavedListsTask.setStringString(null);
+					displaySavedListsTask.execute();
+				}
 				break;
 			}
 		};
@@ -131,6 +151,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		setContentView(R.layout.activity_main);
 		mSelectedItemsList = new ArrayList<Long>();
 
+		mCurrentNotesDisplayType = DISPLAY_FILTER_ALL;
 		INTERNAL_STORAGE_PATH = getFilesDir().getPath() +"/" + NOTES_PARENT_DIR_NAME;
 		
 		final Utils utils = Utils.getInstance();
@@ -145,8 +166,12 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 		 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        mActionBar = getActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
+        mActionBar.setCustomView(R.layout.action_bar_search);
+        final EditText mSearchEditText = (EditText) mActionBar.getCustomView().findViewById(R.id.search_view);
+        mSearchEditText.addTextChangedListener(this);
         
 		mDBHelper = NotesDBHelper.getInstance(NotesActivity.this);
 		mDBHelper.open();
@@ -170,7 +195,8 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 
 					if(mSelectedItemsList.size() == 0) {
 						//refresh the ui list
-						DisplaySavedLists displaySavedListsTask = new DisplaySavedLists(); ;
+						DisplaySavedLists displaySavedListsTask = new DisplaySavedLists();
+						displaySavedListsTask.setStringString(null);
 						displaySavedListsTask.execute();
 						mActionMode.finish();
 						return;
@@ -209,6 +235,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				if(mSelectedItemsList.size() == 0) {
 					//refresh the ui list
 					DisplaySavedLists displaySavedListsTask = new DisplaySavedLists(); ;
+					displaySavedListsTask.setStringString(null);
 					displaySavedListsTask.execute();
 					mActionMode.finish();
 					return true;
@@ -267,10 +294,14 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	protected void onResume() {
 		super.onResume();
 		
-		//load all the saved notes and display in the activity
-		DisplaySavedLists displaySavedListsTask = new DisplaySavedLists(); ;
-		displaySavedListsTask.execute();
-		
+		if(mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) { 
+			removeCustomSearchView();
+		} else {
+			//load all the saved notes and display in the activity
+			DisplaySavedLists displaySavedListsTask = new DisplaySavedLists();
+			displaySavedListsTask.setStringString(null);
+			displaySavedListsTask.execute();
+		}
 		if(CloudUtils.isDropboxLoginStarted()) {
 			CloudUtils.finishDropboxAuthentication();
 		}
@@ -306,6 +337,11 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.action_bar_menu_options, menu);
+		
+		mSearchMenuItem = menu.findItem(R.id.menu_search); 
+		if(mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) {
+			mSearchMenuItem.setVisible(false);
+		}
 		return true;
 	} 
 
@@ -315,6 +351,16 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			return true;
 		}
 		switch (item.getItemId()) {
+		case R.id.menu_search:
+			mCurrentNotesDisplayType = DISPLAY_FILTER_SEARCH;
+			mSearchMenuItem.setVisible(false);
+			mActionBar.setDisplayShowCustomEnabled(true);
+			
+			final EditText searchEdit = (EditText) mActionBar.getCustomView().findViewById(R.id.search_view);
+			searchEdit.setText("");
+			searchEdit.requestFocus();
+			
+			break;
 		case R.id.menu_add_new_note:
 			final Intent i = new Intent(NotesActivity.this, CreateEditNoteActivity.class);
 			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -344,6 +390,31 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		return true;
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_BACK && 
+					mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) {
+			removeCustomSearchView();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	private void removeCustomSearchView() {
+		final EditText searchEdit = (EditText) mActionBar.getCustomView().findViewById(R.id.search_view);
+		final InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(searchEdit.getWindowToken(), 0);
+		
+		mActionBar.setDisplayShowCustomEnabled(false);
+		mSearchMenuItem.setVisible(true);
+		mCurrentNotesDisplayType = DISPLAY_FILTER_ALL;
+		
+		//load all the saved notes and display in the activity
+		DisplaySavedLists displaySavedListsTask = new DisplaySavedLists();
+		displaySavedListsTask.setStringString(null);
+		displaySavedListsTask.execute();
+	}
+	
 	private ActionMode.Callback ActionModeCallback = new ActionMode.Callback() {
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -400,9 +471,14 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				break;
 			}
 			
-			//refresh the ui list
-			DisplaySavedLists displaySavedListsTask = new DisplaySavedLists(); ;
-			displaySavedListsTask.execute();
+			if(mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) {
+				removeCustomSearchView();
+			} else {
+				//refresh the ui list
+				DisplaySavedLists displaySavedListsTask = new DisplaySavedLists(); ;
+				displaySavedListsTask.setStringString(null);
+				displaySavedListsTask.execute();
+			}
 			
 			mode.finish();
 			return true;
@@ -661,6 +737,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	class DisplaySavedLists extends AsyncTask<Void, Void, Void> {
 
 		private ArrayList<Note> data;
+		private String searchString;
 
 		@Override
 		protected void onPreExecute() {
@@ -668,9 +745,26 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			data = new ArrayList<Note>();
 		}
 
+		public void setStringString(final String searchStr) {
+			searchString = searchStr;
+		}
+		
 		@Override
 		protected Void doInBackground(Void... params) {
-			data = mDBHelper.getAllSavedNotes();
+			switch (mCurrentNotesDisplayType) {
+			case DISPLAY_FILTER_ALL:
+				data = mDBHelper.getAllSavedNotes();
+				break;
+			case DISPLAY_FILTER_SEARCH:
+				data = mDBHelper.getSearchNotes(searchString);
+				break;
+			case DISPLAY_FILTER_LABLES:
+
+				break;
+			default:
+				data = mDBHelper.getAllSavedNotes();
+				break;
+			}
 			return null;
 		}
 
@@ -683,15 +777,18 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			mNotesListView.setAdapter(mNotesAdapter);
 
 			mProgressBar.setVisibility(View.GONE);
-			if(data.size() == 0) {
+			if(data == null || data.size() == 0) {
 				mNotesListView.setVisibility(View.GONE);
 				mTextview.setVisibility(View.VISIBLE);
 
-				SpannableStringBuilder msgToDisplay = new SpannableStringBuilder("\nTap on   icon to create new note.");
-				Bitmap smiley = BitmapFactory.decodeResource( getResources(), R.drawable.ic_add);
-				msgToDisplay.setSpan(new ImageSpan( smiley ), 8, 9, Spannable.SPAN_INCLUSIVE_INCLUSIVE );
-				mTextview.setText(msgToDisplay);
-
+				if(mCurrentNotesDisplayType == DISPLAY_FILTER_ALL) {
+					SpannableStringBuilder msgToDisplay = new SpannableStringBuilder("\nTap on   icon to create new note.");
+					Bitmap smiley = BitmapFactory.decodeResource( getResources(), R.drawable.ic_add);
+					msgToDisplay.setSpan(new ImageSpan( smiley ), 8, 9, Spannable.SPAN_INCLUSIVE_INCLUSIVE );
+					mTextview.setText(msgToDisplay);
+				} else if(mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) {
+					mTextview.setText(getString(R.string.no_search_results));
+				}
 			} else {
 				mNotesListView.setVisibility(View.VISIBLE);
 				mTextview.setVisibility(View.GONE);
@@ -834,4 +931,20 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			}
 		}
 	}
+
+	@Override
+	public void afterTextChanged(Editable arg0) {
+		if(arg0 != null) {
+			final String str = arg0.toString();
+			if(!TextUtils.isEmpty(str)) {
+				DisplaySavedLists displaySavedListsTask = new DisplaySavedLists();
+				displaySavedListsTask.setStringString(str);
+				displaySavedListsTask.execute();
+			}
+		}
+	}
+	@Override
+	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
+	@Override
+	public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
 }
