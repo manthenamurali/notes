@@ -14,7 +14,8 @@
     <string name="saved">Saved</string>
     <string name="note_discarded">Note Discarded</string>
     
-     <string name="no_search_results">No search results found</string>
+    <string name="no_search_results">No search results found</string>
+    <string name="no_labels_results">No notes found for this label. \n Press back to view all notes</string>
     
     <string name="confirm_delete_title">Confirm Delete</string>
     <string name="confirm_delete_msg">Are you sure you want to delete?</string>

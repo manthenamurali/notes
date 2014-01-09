@@ -50,6 +50,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -71,7 +72,7 @@ import com.mkr.notes.labels.LabelUtils;
 import com.mkr.notes.labels.LabelsActivity;
 import com.mkr.notesdatabase.NotesDBHelper;
 
-public class NotesActivity extends Activity implements OnSharedPreferenceChangeListener, TextWatcher {
+public class NotesActivity extends Activity implements OnSharedPreferenceChangeListener, TextWatcher, OnClickListener {
 
 	public static final String TAG = "Sync Notes";
 	
@@ -99,6 +100,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	private NotesAdapter mNotesAdapter;
 	private NotesDBHelper mDBHelper;
 
+	private LinearLayout mLabelHeaderLinearLayout;
 	private ListView mNotesListView;
 	private ProgressBar mProgressBar;
 	private TextView mTextview;
@@ -114,6 +116,8 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	private ActionBar mActionBar;
 	private MenuItem mSearchMenuItem; 
 	private int mCurrentNotesDisplayType = DISPLAY_FILTER_ALL;
+	
+	private String mSelectedFilterLabel = null;
 	
 	Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -179,7 +183,10 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		mProgressBar = (ProgressBar) findViewById(R.id.notes_progress_bar);
 		mTextview = (TextView) findViewById(R.id.notes_message_textview);
 		mNotesListView = (ListView) findViewById(R.id.notes_list_view);
-
+		mLabelHeaderLinearLayout = (LinearLayout) findViewById(R.id.labels_header);
+		mLabelHeaderLinearLayout.setVisibility(View.GONE);
+		findViewById(R.id.labelfilter_navigate_back).setOnClickListener(this);
+		
 		mTextview.setTypeface(utils.getFontTypefaceForTitles());
 		mNotesListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -392,12 +399,28 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == KeyEvent.KEYCODE_BACK && 
-					mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) {
-			removeCustomSearchView();
-			return true;
+		if(keyCode == KeyEvent.KEYCODE_BACK) { 
+			if(mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) {
+				removeCustomSearchView();
+				return true;
+			} else if(mCurrentNotesDisplayType == DISPLAY_FILTER_LABLES) {
+				backPressedFromFilterLabels();
+				return true;
+			}
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	private void backPressedFromFilterLabels() {
+		mCurrentNotesDisplayType = DISPLAY_FILTER_ALL;
+		mSelectedFilterLabel = null;
+		
+		//load all the saved notes and display in the activity
+		DisplaySavedLists displaySavedListsTask = new DisplaySavedLists();
+		displaySavedListsTask.setStringString(null);
+		displaySavedListsTask.execute();
+		
+		mLabelHeaderLinearLayout.setVisibility(View.GONE);
 	}
 	
 	private void removeCustomSearchView() {
@@ -602,6 +625,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		
 		for (String label : labelNamesList ) {
 			final RelativeLayout lableLayout = (RelativeLayout) inflater.inflate(R.layout.label_item, null);
+			lableLayout.setOnClickListener(this); 
 			((TextView)lableLayout.findViewById(R.id.lable_name)).setText(label);
 			((TextView)lableLayout.findViewById(R.id.lable_color)).setBackgroundColor((Integer) labels.get(label));
 			
@@ -759,7 +783,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 				data = mDBHelper.getSearchNotes(searchString);
 				break;
 			case DISPLAY_FILTER_LABLES:
-
+				data = mDBHelper.getNotesForLabel(mSelectedFilterLabel);
 				break;
 			default:
 				data = mDBHelper.getAllSavedNotes();
@@ -788,6 +812,8 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 					mTextview.setText(msgToDisplay);
 				} else if(mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) {
 					mTextview.setText(getString(R.string.no_search_results));
+				} else if(mCurrentNotesDisplayType == DISPLAY_FILTER_LABLES) {
+					mTextview.setText(getString(R.string.no_labels_results));
 				}
 			} else {
 				mNotesListView.setVisibility(View.VISIBLE);
@@ -947,4 +973,27 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
 	@Override
 	public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
+
+	@Override
+	public void onClick(View arg0) {
+		if(arg0 instanceof ImageView) {
+			if(arg0.getId() == R.id.labelfilter_navigate_back) {
+				backPressedFromFilterLabels();
+				return;
+			}
+		}
+		
+		final TextView labelName = (TextView) arg0.findViewById(R.id.lable_name);
+		
+		mDrawerLayout.closeDrawer(Gravity.LEFT);
+		
+		mCurrentNotesDisplayType = DISPLAY_FILTER_LABLES;
+		mSelectedFilterLabel = labelName.getText().toString();
+		mLabelHeaderLinearLayout.setVisibility(View.VISIBLE);
+		((TextView) mLabelHeaderLinearLayout.findViewById(R.id.labelfilter_name)).setText(mSelectedFilterLabel);
+		
+		DisplaySavedLists displaySavedListsTask = new DisplaySavedLists();
+		displaySavedListsTask.setStringString(null);
+		displaySavedListsTask.execute();
+	}
 }

@@ -163,6 +163,34 @@ public class NotesDBHelper {
 	}
 	
 	/**
+	 * get all notes to the assciated labels
+	 * @param label
+	 * @return
+	 */
+	public ArrayList<Note> getNotesForLabel(final String label) {
+		if(mSQLWritableDatabase == null) return null;
+		
+		final String searchQuery = "select * from " + SQLiteHelper.TABLE_NAME + " where " + SQLiteHelper.COLUMN_NOTE_LABEL
+						+ " = '"+label+"' ";
+		final ArrayList<Note> notesList = new ArrayList<Note>();
+		final Cursor cursor = mSQLWritableDatabase.rawQuery(searchQuery, null);
+		if(cursor != null) {
+			while (cursor.moveToNext()) {
+				final Note note = new Note();
+				note.createDate = Long.valueOf(cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_CREATED_TIME)));
+				note.modifiedDate = Long.valueOf(cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_MODIFIED_TIME)));
+				note.title = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_TITLE));
+				note.NotePath = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_PATH));
+				note.NoteLabel = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_LABEL));
+				final int hasCustomTitle = Integer.valueOf(cursor.getInt(cursor.getColumnIndex(SQLiteHelper.COLUMN_HAS_CUSTOM_TITLE)));
+				note.hasTitle = hasCustomTitle == 1 ? true : false; 
+				notesList.add(note);
+			}
+		}
+		return notesList;
+	}
+	
+	/**
 	 * get the search result for the search sting
 	 * 
 	 * @param searchString

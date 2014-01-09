@@ -5,6 +5,7 @@
     <color name="list_item_date_bg">#746b62</color>
     
     <color name="side_panel_item_text_color">#58585b</color>
+    <color name="vertical_line_color">#a3a3a7</color>
     
     <color name="label_color_personal">#ec7000</color>
     <color name="label_color_work">#0099cc</color>
