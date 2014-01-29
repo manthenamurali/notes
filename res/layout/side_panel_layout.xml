@@ -16,7 +16,7 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/side_pane_item_height"
+                android:layout_height="@dimen/side_pane_item_height2"
                 android:gravity="left|bottom"
                 android:paddingLeft="@dimen/side_pane_item_paddingleft"
                 android:text="@string/sync_to"
@@ -32,6 +32,27 @@
             <include
                 android:id="@+id/side_pane_item_dropbox"
                 layout="@layout/side_panel_item" />
+            
+             <ImageView
+                 android:layout_width="fill_parent"
+                 android:layout_height="1dip"
+                 android:layout_below="@id/lable_name"
+                 android:layout_marginLeft="@dimen/side_pane_item_paddingleft"
+                 android:layout_marginRight="@dimen/side_pane_item_paddingleft"
+                 android:background="@color/side_panel_items_divider" />
+             
+            <include
+                android:id="@+id/side_pane_item_googledrive"
+                layout="@layout/side_panel_item" />
+            
+            <ImageView
+                 android:layout_width="fill_parent"
+                 android:layout_height="1dip"
+                 android:layout_below="@id/lable_name"
+                 android:layout_marginLeft="@dimen/side_pane_item_paddingleft"
+                 android:layout_marginRight="@dimen/side_pane_item_paddingleft"
+                 android:background="@color/side_panel_items_divider" />
+            
         </LinearLayout>
 
         <RelativeLayout
@@ -41,12 +62,12 @@
             <LinearLayout
                 android:id="@+id/relative"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/title1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/side_pane_item_height2"
                     android:layout_gravity="bottom"
                     android:layout_weight="1"
                     android:gravity="bottom"
@@ -59,8 +80,8 @@
 
                 <ImageView
                     android:id="@+id/edit_labels"
-                    android:layout_width="48dip"
-                    android:layout_height="48dip"
+                    android:layout_width="60dip"
+                    android:layout_height="@dimen/side_pane_item_height2"
                     android:layout_gravity="right"
                     android:scaleType="center"
                     android:layout_marginRight="10dip"

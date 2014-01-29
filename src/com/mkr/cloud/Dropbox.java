@@ -123,11 +123,11 @@ public class Dropbox {
 		}
 	}
 
-	public static boolean isAlreadyLogged() {
+	public boolean isAlreadyLogged() {
 		return mIsAlreadyLoggedIn;
 	}
 
-	public void Login() {
+	public void login() {
 		mDBApi.getSession().startAuthentication(mContext);
 	}
 

@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.mkr.notes.NotesActivity;
 import com.mkr.notes.R;
+import com.mkr.notesdatabase.NotesDBHelper;
 
 public class LabelsActivity extends Activity {
 
@@ -175,7 +176,6 @@ public class LabelsActivity extends Activity {
 
 		ViewTreeObserver vto = dialogView.getViewTreeObserver();
 		vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-			@SuppressWarnings("deprecation")
 			@Override public void onGlobalLayout() {
 				//moveCursor();
 				//moveTarget();
@@ -302,6 +302,8 @@ public class LabelsActivity extends Activity {
 				LabelUtils.deleteLabel(label);
 				mLabelAdapter.updateValues();
 				mLabelAdapter.notifyDataSetChanged();
+				
+				NotesDBHelper.getInstance(LabelsActivity.this).updateLables();
 			}
 		});
 		

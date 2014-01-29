@@ -48,7 +48,6 @@ public class SettingsActivity extends PreferenceActivity{
 	
 	//public static final String PREF_NOTE_OPEN_OPTIONS   	= "notes_open_type";
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

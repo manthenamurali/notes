@@ -11,6 +11,7 @@
     <dimen name="day_month_text_size">12sp</dimen>
     
     <dimen name="side_pane_item_height">50dip</dimen>
+    <dimen name="side_pane_item_height2">40dip</dimen>
     <dimen name="side_pane_item_paddingleft">10dip</dimen>
     <dimen name="side_pane_item_paddingleft2">20dip</dimen>
     

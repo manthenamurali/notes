@@ -136,7 +136,6 @@ public class CreateEditNoteActivity extends Activity implements ActionBar.OnNavi
 		});
 	}
 
-	@SuppressWarnings("deprecation")
 	final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
 	    public boolean onDoubleTap(MotionEvent e) {
 	    	editNote();

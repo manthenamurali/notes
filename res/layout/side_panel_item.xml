@@ -4,15 +4,24 @@
     android:layout_height="match_parent"
     android:background="@drawable/tool_bar_bg" >
 
+    <ImageView
+        android:id="@+id/side_pane_item_icon"
+        android:layout_width="36dip"
+        android:layout_height="36dip"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/side_pane_item_paddingleft"
+        android:paddingLeft="@dimen/side_pane_item_paddingleft" />
+
     <TextView
         android:id="@+id/side_pane_item_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/side_pane_item_icon"
         android:gravity="left|center_vertical"
-        android:paddingBottom="3dip"
-        android:paddingLeft="@dimen/side_pane_item_paddingleft2"
+        android:paddingBottom="1dip"
         android:paddingRight="@dimen/side_pane_item_paddingleft"
-        android:paddingTop="@dimen/side_pane_item_paddingleft"
+        android:paddingTop="5dip"
         android:textColor="@color/side_panel_item_text_color"
         android:textSize="23sp"
         android:typeface="serif" />
@@ -22,8 +31,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/side_pane_item_title"
+        android:paddingBottom="5dip"
+        android:layout_toRightOf="@id/side_pane_item_icon"
         android:gravity="left|top"
-        android:paddingLeft="@dimen/side_pane_item_paddingleft2"
         android:textColor="@color/side_panel_item_text_color"
         android:textSize="12sp"
         android:typeface="serif" />

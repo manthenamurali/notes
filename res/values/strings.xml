@@ -40,7 +40,9 @@
  	<string name="saved_to_sdcard">File(s) are saved to your SDCard at </string>
  	
  	<string name="cloud_upload_started">Uploading file(s)...</string>
- 	<string name="cloud_upload_finish_dropbox">Files Successfully uploaded to your dropbox account</string>
+ 	<string name="cloud_upload_finish_dropbox">Files Successfully uploaded to your Dropbox account</string>
+ 	<string name="cloud_upload_finish_googledrive">Files Successfully uploaded to your Google Drive account</string>
+ 	<string name="cloud_upload_failed">Upload failed. Please try again</string>
  	
     <string name="pref_themes_title">Themes</string>
     <string name="pref_themes_summary">Set the notepad theme</string>
@@ -63,6 +65,7 @@
     
     <string name="sync_to">Sync to</string>
     <string name="dropbox_title">DropBox</string>
+    <string name="googledrive_title">Google Drive</string>
    
     <string name="subtitle_login">Tap to Login</string>
     <string name="subtitle_logout">Tap to Logout</string>
@@ -70,6 +73,7 @@
     <string name="already_logged">Already Logged-in</string>
     <string name="logout">Logout</string>
     <string name="remove_added_dropbox_account">Do you want to log-out from your Dropbox account?</string>
+    <string name="remove_added_googledrive_account">Do you want to log-out from your Google Drive account?</string>
     <string name="add_account_succesful">Account added succesfully</string>
     <string name="remove_account_succesful">Account succesfully removed</string>
     
@@ -90,6 +94,6 @@
     
     <string name="welcome_msg">Welcome to Sync Notes</string>
  	<string name="change_log"><b>Change Log :</b>
- 	    \n\n <b>v0.1</b> \n\t ● First Release \n\t ● Save to DropBox \n\t ● Labels Manager
+ 	    \n\n <b>v0.1</b> \n\t ● First Release \n\t ● Save notes to DropBox and Google Drive \n\t ● Labels Manager
  	    \n</string>
 </resources>

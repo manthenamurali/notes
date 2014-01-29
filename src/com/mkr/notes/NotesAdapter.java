@@ -86,9 +86,9 @@ public class NotesAdapter extends android.widget.BaseAdapter {
 		holder.mDay.setText(date.substring(0, 3));
 				
 		if(mSelectedList != null && mSelectedList.contains(data.createDate)) {
-			holder.mListParent.setBackground(mContext.getResources().getDrawable(R.drawable.background_selected));
+			holder.mListParent.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.background_selected));
 		} else {
-			holder.mListParent.setBackground(mContext.getResources().getDrawable(R.drawable.background));
+			holder.mListParent.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.background));
 		}
 		
 		return convertView;

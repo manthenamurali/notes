@@ -2,6 +2,7 @@ package com.mkr.notesdatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.content.ContentValues;
@@ -12,6 +13,8 @@ import android.util.Log;
 
 import com.mkr.notes.Note;
 import com.mkr.notes.NotesActivity;
+import com.mkr.notes.labels.LabelUtils;
+import com.mkr.notes.labels.LabelsActivity;
 
 public class NotesDBHelper {
 
@@ -135,6 +138,37 @@ public class NotesDBHelper {
 		return mNotesInfo;
 	}
 
+	public void updateLables() {
+
+		if(mSQLWritableDatabase == null) return ; 
+
+		final Cursor cursor = mSQLWritableDatabase.query(SQLiteHelper.TABLE_NAME, allColumns, 
+				null, null, null, null, null);
+		List<Long> createdTimeList = new ArrayList<Long>();
+		LabelUtils.getAllSavedLables();
+		if(cursor != null) {
+			while (cursor.moveToNext()) {
+				final String noteLabel = cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_NOTE_LABEL));
+				if(!LabelUtils.checkIfLabelAlreadyExists(noteLabel)) {
+					long createdTime = Long.valueOf(cursor.getString(cursor.getColumnIndex(SQLiteHelper.COLUMN_CREATED_TIME)));
+					createdTimeList.add(createdTime);
+				}
+			}
+		}
+
+		for (int i = 0; i < createdTimeList.size(); i++) {
+			final ContentValues values = new ContentValues();
+			values.put(SQLiteHelper.COLUMN_NOTE_LABEL, LabelsActivity.LABELS_DEFAULT_PERSONAL);
+			if(mSQLWritableDatabase.isOpen()) {
+				int rowID = mSQLWritableDatabase.update(SQLiteHelper.TABLE_NAME, values, SQLiteHelper.COLUMN_CREATED_TIME 
+						+ " = " + createdTimeList.get(i), null);
+				if(rowID == -1) {
+					//Log.e("mkr","failed to insert");
+				}
+			}
+		}
+	}
+	
 	/**
 	 * get the number of notes that are associated with each labels ie.. number of work labels, personal labels etc..<br>
 	 * work label -- 2 notes<br>

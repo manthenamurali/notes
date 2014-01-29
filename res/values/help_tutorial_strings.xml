@@ -4,24 +4,24 @@
     <integer name="max_help_tut_pages">8</integer>
 
     <string name="help_page_title_1">Add Note</string>
-    <string name="help_page_description_1">Tap on + icon (top-right of the application) to create a new note</string>
+    <string name="help_page_description_1">Tap on \"+\" icon (top-right of the application) to create a new note.</string>
     
     <string name="help_page_title_2">Save Note</string>
-    <string name="help_page_description_2">After typing your text just tap on the device back key to save the note</string>
+    <string name="help_page_description_2">After typing your text just tap on the device back key to save the note.</string>
     
     <string name="help_page_title_3">Delete Note</string>
-    <string name="help_page_description_3">Long tap on any note and tap on the delete icon in the displayed options</string>
+    <string name="help_page_description_3">Long tap on any note and tap on the delete icon in the displayed options.</string>
     
     <string name="help_page_title_4">Export Note</string>
-    <string name="help_page_description_4">Long tap on any note and tap on the save icon to save the notes on the External storage of your device</string>
+    <string name="help_page_description_4">Long tap on any note and tap on the save icon to save the notes on the External storage(SDCard) of your device.</string>
     
     <string name="help_page_title_5">Sync and Label Settings</string>
-    <string name="help_page_description_5">Tap on the app icon on the top-left or swipe from the left of the screen to access sync and label manager settings</string>
+    <string name="help_page_description_5">Tap on the app icon on the top-left or swipe from the left of the screen to access sync and label manager settings.</string>
     
     <string name="help_page_title_6">Upload Notes to cloud</string>
-    <string name="help_page_description_6">First login to your dropbox account. \n Then long press on any note and select the cloud icon from the options</string>
+    <string name="help_page_description_6">First login to your Dropbox or Google Drive account. \n Then long press on any note and select the cloud icon from the options.</string>
     
     <string name="help_page_title_7">Create new labels</string>
-    <string name="help_page_description_7">Tap on the edit icon in the side panel to create new labels</string>
+    <string name="help_page_description_7">Tap on the edit icon in the side panel to create new labels.</string>
 
 </resources>

@@ -26,6 +26,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -55,6 +56,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -65,8 +67,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.mkr.cloud.CloudUtils;
-import com.mkr.cloud.Dropbox;
+import com.mkr.cloud.GoogleDrive;
 import com.mkr.notes.NotesAdapter.Holder;
 import com.mkr.notes.labels.LabelUtils;
 import com.mkr.notes.labels.LabelsActivity;
@@ -117,6 +121,8 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	private MenuItem mSearchMenuItem; 
 	private int mCurrentNotesDisplayType = DISPLAY_FILTER_ALL;
 	
+	private AdView mAdView;
+	
 	private String mSelectedFilterLabel = null;
 	
 	Handler handler = new Handler() {
@@ -147,7 +153,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			}
 		};
 	};
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -266,6 +272,9 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			}
 			public void onDrawerOpened(View drawerView) {
 				updateSidepaneHandler.sendEmptyMessage(0);
+				if(!mSearchMenuItem.isVisible()) {
+					removeCustomSearchView();
+				}
 				invalidateOptionsMenu(); 
 			}
 		};
@@ -278,6 +287,10 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		
 		updateSidepaneHandler.sendEmptyMessage(0);
 		
+		mAdView = (AdView)this.findViewById(R.id.adView);
+	    final AdRequest adRequest = new AdRequest.Builder().build();
+	    mAdView.loadAd(adRequest);
+	
 		final boolean shouldDispChangeLog = sPref.getBoolean(SettingsActivity.PREF_FIRST_LAUNCH, true);
 		if(shouldDispChangeLog) {
 			sPref.edit().putBoolean(SettingsActivity.PREF_FIRST_LAUNCH, false).commit();
@@ -301,6 +314,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	protected void onResume() {
 		super.onResume();
 		
+		mAdView.resume();
 		if(mCurrentNotesDisplayType == DISPLAY_FILTER_SEARCH) { 
 			removeCustomSearchView();
 		} else {
@@ -314,6 +328,12 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		}
 	}
 
+	@Override
+	protected void onPause() {
+		mAdView.pause();
+		super.onPause();
+	}
+	
 	/**
 	 * create a notes folder in the internal storage in which all the notes will be saved
 	 */
@@ -359,6 +379,10 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		}
 		switch (item.getItemId()) {
 		case R.id.menu_search:
+
+			//close the drawer
+			mDrawerLayout.closeDrawers();
+			
 			mCurrentNotesDisplayType = DISPLAY_FILTER_SEARCH;
 			mSearchMenuItem.setVisible(false);
 			mActionBar.setDisplayShowCustomEnabled(true);
@@ -390,7 +414,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 			emailIntent.setType("plain/text");
 			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "manthena.android@gmail.com" });
-			emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Notepad : New feature/Suggestion");
+			emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "SyncNotes : New feature/Suggestion");
 			startActivity(Intent.createChooser(emailIntent,"Send your feedback"));
 			break;
 		}
@@ -550,16 +574,25 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		builder.setTitle(getString(R.string.select_cloud_options));
 		final String[] options = CloudUtils.getInstance().getAllInstalledCloudOptions();
 		//if no cloud storage are selected yet display a user asking to login to atleast one account
+		final ListView optionsListView = new ListView(NotesActivity.this);
 		if(options == null) {
 			builder.setMessage(getString(R.string.login_into));
 		} else {
-			builder.setSingleChoiceItems(options, 0, new DialogInterface.OnClickListener() {
+			
+			optionsListView.setCacheColorHint(Color.TRANSPARENT);
+			optionsListView.setAdapter(new ArrayAdapter<String>(NotesActivity.this, 
+					android.R.layout.simple_list_item_single_choice,
+                    android.R.id.text1, options));
+			optionsListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+			builder.setView(optionsListView);
+			
+			/*builder.setSingleChoiceItems(options, 0, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					
 				}
-			});
+			});*/
 		}
+		
 		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -568,12 +601,16 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 					mDrawerLayout.openDrawer(Gravity.LEFT);
 				} else {
 					if(CloudUtils.getInstance().isNetworkConnected()) {
-						switch (which) {
-						case -1:
-							CloudUtils.getInstance().uploadFiles(filesToUpload, R.string.dropbox_title);
-							break;
-						default:
-							break;
+						final int checkedPosition = optionsListView.getCheckedItemPosition();
+						if(checkedPosition != -1) {
+							if(getString(R.string.dropbox_title).equals(options[checkedPosition])) {
+								CloudUtils.getInstance().uploadFiles(filesToUpload, R.string.dropbox_title);
+							} else if(getString(R.string.googledrive_title).equals(options[checkedPosition])) {
+								//CloudUtils.getInstance().uploadFiles(filesToUpload, R.string.googledrive_title);
+								CloudUtils.displayDriveDialog(filesToUpload);
+							} else {
+								//nothing
+							}
 						}
 					} else {
 						Toast.makeText(NotesActivity.this, getString(R.string.no_network), Toast.LENGTH_LONG).show();
@@ -593,11 +630,24 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	
 	private void updateSidePaneLayout() {
 		final RelativeLayout dropBoxView = (RelativeLayout) findViewById(R.id.side_pane_item_dropbox);
+		final RelativeLayout googleDriveView = (RelativeLayout) findViewById(R.id.side_pane_item_googledrive);
+		
 		((TextView) dropBoxView.findViewById(R.id.side_pane_item_title)).setText(getString(R.string.dropbox_title));
-		if(!Dropbox.isAlreadyLogged()) {
+		((TextView) googleDriveView.findViewById(R.id.side_pane_item_title)).setText(getString(R.string.googledrive_title));
+		
+		((ImageView) dropBoxView.findViewById(R.id.side_pane_item_icon)).setImageResource(R.drawable.dropbox);
+		((ImageView) googleDriveView.findViewById(R.id.side_pane_item_icon)).setImageResource(R.drawable.googledrive);
+		
+		if(!CloudUtils.isDropBoxLoggedIn()) {
 			((TextView) dropBoxView.findViewById(R.id.side_pane_item_summary)).setText(getString(R.string.subtitle_login));
 		} else {
 			((TextView) dropBoxView.findViewById(R.id.side_pane_item_summary)).setText(getString(R.string.subtitle_logout));
+		}
+		
+		if(!CloudUtils.isGoogleDriveLoggedIn()) {
+			((TextView) googleDriveView.findViewById(R.id.side_pane_item_summary)).setText(getString(R.string.subtitle_login));
+		} else {
+			((TextView) googleDriveView.findViewById(R.id.side_pane_item_summary)).setText(getString(R.string.subtitle_logout));
 		}
 		
 		final LinearLayout labelsParent = (LinearLayout) findViewById(R.id.labels_parent_linear_layout);
@@ -643,6 +693,14 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			public void onClick(View v) {
 				mDrawerLayout.closeDrawers();
 				CloudUtils.getInstance().loginIntoDropBox(NotesActivity.this);
+			}
+		});
+		
+		googleDriveView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mDrawerLayout.closeDrawers();
+				CloudUtils.getInstance().loginIntoGoogleDrive();
 			}
 		});
 		
@@ -792,7 +850,6 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			return null;
 		}
 
-		@SuppressWarnings("deprecation")
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
@@ -899,9 +956,9 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			}
 		});
 
-		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+		builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
 			@Override
-			public void onDismiss(DialogInterface dialog) {
+			public void onCancel(DialogInterface dialog) {
 				mHelpTutorialPage = 1;
 			}
 		});
@@ -936,6 +993,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 	
 	@Override
 	protected void onDestroy() {
+		mAdView.destroy();
 		super.onDestroy();
 		mDBHelper.close();
 	}
@@ -995,5 +1053,18 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		DisplaySavedLists displaySavedListsTask = new DisplaySavedLists();
 		displaySavedListsTask.setStringString(null);
 		displaySavedListsTask.execute();
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == GoogleDrive.REQUEST_CODE_RESOLUTION && resultCode == RESULT_OK) {
+			CloudUtils.connectToGoogleDrive();
+		}
+		
+		if(requestCode ==  GoogleDrive.REQUEST_CODE_CREATOR) {
+			CloudUtils.getDriveId(data);
+		}
 	}
 }
