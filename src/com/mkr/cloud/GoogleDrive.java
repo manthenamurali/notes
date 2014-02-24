@@ -17,16 +17,15 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Contents;
 import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.OpenFileActivityBuilder;
 import com.google.android.gms.drive.DriveApi.ContentsResult;
-import com.google.android.gms.drive.DriveApi.OnNewContentsCallback;
 import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveFile.OnContentsOpenedCallback;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource.MetadataResult;
 import com.google.android.gms.drive.MetadataChangeSet;
+import com.google.android.gms.drive.OpenFileActivityBuilder;
 import com.mkr.notes.Note;
 import com.mkr.notes.R;
 import com.mkr.notes.Utils;
@@ -95,8 +94,10 @@ GoogleApiClient.OnConnectionFailedListener {
 	}
 
 	@Override
-	public void onDisconnected() { }
-
+	public void onConnectionSuspended(int arg0) {
+		
+	}
+	
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
 		/*if (!result.hasResolution()) {
@@ -113,25 +114,27 @@ GoogleApiClient.OnConnectionFailedListener {
 	public void openDriveDefaultDialog(final File[] filesToUpload) {
 		mFilesToUpload = filesToUpload;
 		
-		OnNewContentsCallback onContentsCallback = new OnNewContentsCallback() {
-			@Override
-			public void onNewContents(ContentsResult result) {
-				MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-										.setMimeType("text/plain" ).build();
-				IntentSender createIntentSender = Drive.DriveApi
-						.newCreateFileActivityBuilder()
-						.setInitialMetadata(metadataChangeSet)
-						.setInitialContents(result.getContents())
-						.build(mGoogleApiClient);
-				try {
-					((Activity)mContext).startIntentSenderForResult(createIntentSender, REQUEST_CODE_CREATOR, null,
-							0, 0, 0);
-				} catch (SendIntentException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		Drive.DriveApi.newContents(mGoogleApiClient).addResultCallback(onContentsCallback);
+
+        ResultCallback<ContentsResult> onContentsCallback =
+                new ResultCallback<ContentsResult>() {
+            @Override
+            public void onResult(ContentsResult result) {
+                MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
+                        .setMimeType("text/plain" ).build();
+                IntentSender createIntentSender = Drive.DriveApi
+                        .newCreateFileActivityBuilder()
+                        .setInitialMetadata(metadataChangeSet)
+                        .setInitialContents(result.getContents())
+                        .build(mGoogleApiClient);
+                try {
+                	((Activity)mContext).startIntentSenderForResult(createIntentSender, REQUEST_CODE_CREATOR, null,
+                        0, 0, 0);
+                } catch (SendIntentException e) {
+                	e.printStackTrace();
+                }
+            }
+        };
+        Drive.DriveApi.newContents(mGoogleApiClient).setResultCallback(onContentsCallback);
 	}
 	
 	public void getCurrentDriveIdFromDrive(final Intent data) {
@@ -213,31 +216,32 @@ GoogleApiClient.OnConnectionFailedListener {
 	     */
 	    @Override
 	    protected com.google.android.gms.common.api.Status doInBackground(DriveId... params) {
-	        DriveFile file = Drive.DriveApi.getFile(mClient, params[0]);
-	        PendingResult<ContentsResult, OnContentsOpenedCallback> openContentsReq = file
-	                .openContents(mClient, DriveFile.MODE_WRITE_ONLY, null);
-	        com.google.android.gms.common.api.Status status = null;
-	        ContentsResult openContentsResult = openContentsReq.await();
-	        status = openContentsResult.getStatus();
-	        if (!status.isSuccess()) {
-	            return status;
-	        }
+	    	 DriveFile file = Drive.DriveApi.getFile(mClient, params[0]);
+	    	    PendingResult<ContentsResult> openContentsResult =
+	    	        file.openContents(mClient, DriveFile.MODE_WRITE_ONLY, null);
+	    	    openContentsResult.await();
+	    	    if (!openContentsResult.await().getStatus().isSuccess()) {
+	    	      return openContentsResult.await().getStatus();
+	    	    }
 
-	        // apply changes
-	        Changes changes = edit(openContentsResult.getContents());
-	        if (changes.getMetadataChangeSet() != null) {
-	            MetadataResult metadataResult = file.updateMetadata(
-	                    mClient, changes.getMetadataChangeSet()).await();
-	            status = metadataResult.getStatus();
-	            if (!status.isSuccess()) {
-	                return status;
-	            }
-	        }
+	    	    Changes changes = edit(openContentsResult.await().getContents());
+	    	    PendingResult<MetadataResult> metadataResult = null;
+	    	    PendingResult<com.google.android.gms.common.api.Status>
+	    	            closeContentsResult = null;
 
-	        if (changes.getContents() != null) {
-	            status = file.commitAndCloseContents(mClient, changes.getContents()).await();
-	        }
-	        return status;
+	    	    if (changes.getMetadataChangeSet() != null) {
+	    	      metadataResult = file.updateMetadata(mClient, changes.getMetadataChangeSet());
+	    	      metadataResult.await();
+	    	      if (!metadataResult.await().getStatus().isSuccess()) {
+	    	        return metadataResult.await().getStatus();
+	    	      }
+	    	    }
+
+	    	    if (changes.getContents() != null) {
+	    	      closeContentsResult = file.commitAndCloseContents(mClient, changes.getContents());
+	    	      closeContentsResult.await();
+	    	    }
+	    	    return closeContentsResult.await().getStatus();
 	    }
 
 	    /**
