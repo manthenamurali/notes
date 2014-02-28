@@ -607,7 +607,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 								CloudUtils.getInstance().uploadFiles(filesToUpload, R.string.dropbox_title);
 							} else if(getString(R.string.googledrive_title).equals(options[checkedPosition])) {
 								//CloudUtils.getInstance().uploadFiles(filesToUpload, R.string.googledrive_title);
-								CloudUtils.displayDriveDialog(filesToUpload);
+								//CloudUtils.displayDriveDialog(filesToUpload);
 							} else {
 								//nothing
 							}
@@ -700,7 +700,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 			@Override
 			public void onClick(View v) {
 				mDrawerLayout.closeDrawers();
-				CloudUtils.getInstance().loginIntoGoogleDrive();
+				//CloudUtils.getInstance().loginIntoGoogleDrive();
 			}
 		});
 		
@@ -1055,7 +1055,7 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		displaySavedListsTask.execute();
 	}
 	
-	@Override
+	/*@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -1066,5 +1066,5 @@ public class NotesActivity extends Activity implements OnSharedPreferenceChangeL
 		if(requestCode ==  GoogleDrive.REQUEST_CODE_CREATOR) {
 			CloudUtils.getDriveId(data);
 		}
-	}
+	}*/
 }

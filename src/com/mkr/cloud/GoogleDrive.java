@@ -95,7 +95,7 @@ GoogleApiClient.OnConnectionFailedListener {
 
 	@Override
 	public void onConnectionSuspended(int arg0) {
-		
+		Toast.makeText(mContext, mContext.getResources().getString(R.string.add_account_failed), Toast.LENGTH_SHORT).show();
 	}
 	
 	@Override

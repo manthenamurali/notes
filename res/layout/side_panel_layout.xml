@@ -43,10 +43,12 @@
              
             <include
                 android:id="@+id/side_pane_item_googledrive"
+                android:visibility="gone"
                 layout="@layout/side_panel_item" />
             
             <ImageView
                  android:layout_width="fill_parent"
+                 android:visibility="gone"
                  android:layout_height="1dip"
                  android:layout_below="@id/lable_name"
                  android:layout_marginLeft="@dimen/side_pane_item_paddingleft"

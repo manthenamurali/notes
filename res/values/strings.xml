@@ -74,8 +74,9 @@
     <string name="logout">Logout</string>
     <string name="remove_added_dropbox_account">Do you want to log-out from your Dropbox account?</string>
     <string name="remove_added_googledrive_account">Do you want to log-out from your Google Drive account?</string>
-    <string name="add_account_succesful">Account added succesfully</string>
-    <string name="remove_account_succesful">Account succesfully removed</string>
+    <string name="add_account_succesful">Account added successfully</string>
+    <string name="remove_account_succesful">Account successfully removed</string>
+    <string name="add_account_failed">Failed to add account. Please try again later.</string>
     
     <string name="labels_manager">Label Manager</string>
     <string name="lables_title">Labels</string>

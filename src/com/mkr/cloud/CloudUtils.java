@@ -32,7 +32,7 @@ public class CloudUtils {
 	
 	private static CloudUtils mCloudUtils;
 	private static Dropbox mDropbox;
-	private static GoogleDrive mGoogleDrive; 
+	//private static GoogleDrive mGoogleDrive; 
 	
 	private static boolean mIsDropboxLoginStarted = false;
 	
@@ -49,8 +49,8 @@ public class CloudUtils {
 		mDropbox = Dropbox.getInstance();
 		mDropbox.init(context);
 		
-		mGoogleDrive = GoogleDrive.getInstance();
-		mGoogleDrive.init(mContext);
+		//mGoogleDrive = GoogleDrive.getInstance();
+		//mGoogleDrive.init(mContext);
 	}
 	
 	public void loginIntoDropBox(final NotesActivity activity) {
@@ -124,7 +124,7 @@ public class CloudUtils {
 				if(whichAccount.equalsIgnoreCase(res.getString(R.string.dropbox_title))) {
 					mDropbox.logOut();
 				} else if(whichAccount.equalsIgnoreCase(res.getString(R.string.googledrive_title))) {
-					mGoogleDrive.disconnect();
+					//mGoogleDrive.disconnect();
 				}
 			}
 		});
@@ -198,10 +198,11 @@ public class CloudUtils {
 		//-------------Google Drive-------------
 	
 	public static boolean isGoogleDriveLoggedIn() {
-		return mGoogleDrive.isConnected();
+		return false;
+		//return mGoogleDrive.isConnected();
 	}
 	
-	public void loginIntoGoogleDrive() {
+	/*public void loginIntoGoogleDrive() {
 		if(mGoogleDrive.isConnected()) {
 			displayLogoutDialog(mContext.getResources().getString(R.string.googledrive_title));
 		} else {
@@ -223,5 +224,5 @@ public class CloudUtils {
 	
 	public static void displayDriveDialog(File[] filesToUpload) {
 		mGoogleDrive.openDriveDefaultDialog(filesToUpload);
-	}
+	}*/
 }

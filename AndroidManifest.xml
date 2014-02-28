@@ -19,21 +19,21 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light" >
         
-        <meta-data
+         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="4132500" />
+            android:value="4242000" /> 
         
         <activity
             android:name="com.mkr.notes.NotesActivity"
             android:label="@string/app_name" >
             
-            <meta-data
+           <!--  <meta-data
                 android:name="com.google.android.apps.drive.APP_ID"
-                android:value="id=220447577136" />
+                android:value="id=220447577136" /> -->
             
-            <intent-filter>
+             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-				<action android:name="com.google.android.apps.drive.DRIVE_OPEN" />
+				<!-- <action android:name="com.google.android.apps.drive.DRIVE_OPEN" /> -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
